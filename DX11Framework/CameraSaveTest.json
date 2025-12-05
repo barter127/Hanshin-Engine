@@ -1,0 +1,83 @@
+{
+  "Active Cam": 0,
+  "Cameras": [
+    {
+      "AtX": 0.0,
+      "AtY": 0.0,
+      "AtZ": 0.0,
+      "Camera Type": "Debug",
+      "EyeX": -0.3273848295211792,
+      "EyeY": 0.2743481993675232,
+      "EyeZ": -1.9286969900131226,
+      "Pitch": -5.700008869171143,
+      "Sensitivity": 0.30000001192092896,
+      "Speed": 5.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0,
+      "Yaw": 5.7000250816345215
+    },
+    {
+      "AtX": 0.0,
+      "AtY": 0.0,
+      "AtZ": 0.0,
+      "Camera Type": "Base",
+      "EyeX": 0.0,
+      "EyeY": 0.0,
+      "EyeZ": -10.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    {
+      "AtX": 0.0,
+      "AtY": 0.0,
+      "AtZ": 1.0,
+      "Camera Type": "Dolly",
+      "EyeX": 0.0,
+      "EyeY": 0.0,
+      "EyeZ": -5.0,
+      "MoveAutomatically": true,
+      "Path": [
+        {
+          "X": 5.0,
+          "Y": -2.0,
+          "Z": 5.0
+        },
+        {
+          "X": 3.0,
+          "Y": -4.0,
+          "Z": 2.0
+        },
+        {
+          "X": -5.0,
+          "Y": 2.0,
+          "Z": -5.0
+        }
+      ],
+      "PathSize": 3,
+      "RetraceTrack": true,
+      "Speed": 0.5,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    }
+  ],
+  "GameObjects": [
+    {
+      "BaseColourPath": "Models/Iggy/fool_BaseColor.png",
+      "ModelPath": "Models/Iggy/model.obj",
+      "Name": "Iggy",
+      "PosX": -0.4000000059604645,
+      "PosY": -1.0,
+      "PosZ": 2.200000047683716,
+      "RotX": 0.0,
+      "RotY": 180.0,
+      "RotZ": 0.0,
+      "ScaleX": 1.0,
+      "ScaleY": 1.0,
+      "ScaleZ": 1.0
+    }
+  ],
+  "SceneName": "Osaka"
+}

@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{5394c41e-db37-4ff9-a493-8ca4e597f8ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExternalLib">
+      <UniqueIdentifier>{c0b75d73-bc75-46cf-a2a5-2fa5a9aabcaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExternalLib\ImGui">
+      <UniqueIdentifier>{24a936be-01f2-455a-acec-7f7595a19f28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExternalLib\ImGui\Backends">
+      <UniqueIdentifier>{03d9c667-bf92-4a62-9db0-10d082d5cf12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json">
+      <UniqueIdentifier>{b9aac237-1c3a-46f6-8561-311ff54525be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{f949171a-6fb6-4ad7-b11a-09905aa1819e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cameras">
+      <UniqueIdentifier>{dbf715d9-3b2f-4073-851b-6d20b21e78f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Components">
+      <UniqueIdentifier>{43b748ad-c4cf-470e-aac0-4a7273810cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameObjects">
+      <UniqueIdentifier>{03d263b7-5f20-4455-8759-45cbbf546781}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{a7aebb1d-53a7-47db-b833-c40d2e171370}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObjects">
+      <UniqueIdentifier>{0483cebb-2e86-4d4f-888c-a148748962ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Component">
+      <UniqueIdentifier>{9aca8660-1af4-49a3-aa38-a622b8fdcb4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lighting">
+      <UniqueIdentifier>{9946660b-255e-4652-884c-67eca20c2740}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lighting">
+      <UniqueIdentifier>{93e9be4b-fae8-4cfb-af4d-f00fd1bb071d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DX11Framework.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\imgui.cpp">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\imgui_demo.cpp">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\imgui_draw.cpp">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\imgui_tables.cpp">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\imgui_widgets.cpp">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\backend\imgui_impl_dx11.cpp">
+      <Filter>ExternalLib\ImGui\Backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\backend\imgui_impl_dx12.cpp">
+      <Filter>ExternalLib\ImGui\Backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\backend\imgui_impl_win32.cpp">
+      <Filter>ExternalLib\ImGui\Backends</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="DollyCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelComponent.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTextureClass.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureClass.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Blurring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DX11Framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\imconfig.h">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\imgui.h">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\imgui_internal.h">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\imstb_rectpack.h">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\imstb_textedit.h">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\imstb_truetype.h">
+      <Filter>ExternalLib\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\backend\imgui_impl_dx11.h">
+      <Filter>ExternalLib\ImGui\Backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\backend\imgui_impl_dx12.h">
+      <Filter>ExternalLib\ImGui\Backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\backend\imgui_impl_win32.h">
+      <Filter>ExternalLib\ImGui\Backends</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>ExternalLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\json.hpp">
+      <Filter>ExternalLib</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="DollyCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureClass.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTextureClass.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Blurring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SimpleShaders.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="test.json">
+      <Filter>Json</Filter>
+    </None>
+    <None Include="SaveTest.json">
+      <Filter>Json</Filter>
+    </None>
+    <None Include="Skybox.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="GaussianBlur.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\cute-ghost.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DX11Framework.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

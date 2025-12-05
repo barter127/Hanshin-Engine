@@ -1,0 +1,773 @@
+commit e941701d02462b5f140864202a9afc76e85b0eef
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Nov 25 19:04:28 2025 +0000
+
+    Scene Graph!
+    
+    Create a scene graph with limited usability. Using a std::list and shared_ptrs.
+    
+    when a go is rendered it goes through it's children list and recursively calls render until all child objects have been rendered.
+    
+    changed m_objVector to a vector of shared_ptrs instead of pure GameObjects this fixed a hidden bug when creating new objects
+    
+    UI would be nice
+    
+    No dirty bit either as there are no SetTransform funcs that could dirty it I could check if the transform matrices are equal but that would arguably be less efficient than currently
+
+commit f87655ff56993f93dcefee115d77135fb94a120f
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Nov 25 18:47:20 2025 +0000
+
+    Render Multiple Lighting Types at once
+    
+    Changed how rendering is called so only one shared light function exists as lightdata only needs to be uploaded in one big go once.
+    
+    The way some data was uploaded to the GPU was incorrect and messed with pos data for example LightPos in the vertex shader was uploaded as Vector3 which misaligned them.
+    
+    As the deadline is super duper pooper close I am going to start work on scene graphs before I start on spot lights. I will not make UI for the scene graph or read parents from files until spot lights are done
+
+commit 1aebc30f7a832094408a3bfac793841a698e91f2
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Nov 25 15:18:18 2025 +0000
+
+    Gaussian blur values can be edited in UI
+    
+    I also fixed a bug where models could clip through the post process plane by giving the blur class it's own depth stencil state.
+    
+    If I were to have multiple post process shaders I would abstract the current implementation into a child Blur class and a base "Post Process" class
+
+commit 2e80e5b02fc01dad8c1500999cfe86ee55ca09e0
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Nov 25 13:46:11 2025 +0000
+
+    Gaussian blur with hard coded values.
+    
+    Implemented a gaussian blur in a shader.
+    
+    Next I will connect it to some sort of UI
+
+commit e77c88a6710e68ae9bcb4dcbf2366acd0bc587ce
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Nov 25 02:08:37 2025 +0000
+
+    Upload Screen Texture to GPU
+    
+    Added to ability to copy a ShaderResourceView so that it can be edited without the original/copied version changing.
+    
+    This was a lot of stress all because of the temporary Blurring var in the application class.
+    
+    I wanted to implement more advanced blurring algorithms like Dual Kawase but with the time left I will likely not have time.
+    
+    I will create a spot light, a scene graph, and maybe implement normal mapping
+
+commit f3fd053049886f0c801bd2c868176b033b8f8c3d
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Nov 24 10:44:13 2025 +0000
+
+    Created a skeleton class for blurring
+    
+    The next feature to be implemented will be a gaussian blur and, if I have time, a dual kawase blur.
+    
+    I still need to figure out how to make a copy of the SRV so I can edit a copy without affecting the original.
+    
+    I'm going to mellor :>
+
+commit 67a6bc727f1502d2bc58e11ebe036aabee7ac953
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Nov 24 01:30:05 2025 +0000
+
+    Fixed crash related to Transform Panel
+
+commit ae019f5604f568b4391c506a5368be054e06f0d2
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sun Nov 23 18:50:19 2025 +0000
+
+    Attempt at rendering multiple light types at once
+    
+    Currently broken, Light Buffer passes an int to denote it's lighting type. I tried to pass an enum to make it cleaner than using macros but that didn't work.
+    
+    Shaders uses a switch statement to determine how to use the light data and what function to run.
+
+commit 5d42bf5fa2c1ce9436b5734f20f31a1d062d6220
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Nov 18 11:35:17 2025 +0000
+
+    Fixed constant buffer size issue
+    
+    Constant buffer was created as the wrong size (The size of the matrix buffer) and therefore later variables like NumActiveLights were not set properly
+
+commit ad0c4581a15908c5f3bf4f454472f005fed0851f
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sun Nov 16 17:19:22 2025 +0000
+
+    Program can render multiple pointlights
+    
+    The LightPixelBuffer is a set of data shared between all lighting types and means that the data only needs to be uploaded to the GPU once
+    
+    There is currently a bug with how the shader reads NumActiveLights (it's always 0) I wanted to fix it but I am so tilted rn.
+    
+    After fixing the bug it'll be time to start work on spot lights :D
+
+commit 01b24ced3d572c0d32d999b63664fd605b6dd21e
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sun Nov 16 14:45:25 2025 +0000
+
+    Removed Light Material Values
+
+commit 8cffb607eab36ca58990773642bf76e238d07eeb
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Nov 16 13:19:25 2025 +0000
+
+    Fixed Attenuation
+    
+    Attenuation now properly works and the falloff can be edited using the falloff multiplier in the light buffer
+
+commit cd90a5d09e23f305c90d28b2f347fda155043ed6
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 17:32:12 2025 +0000
+
+    Blinn-Phong Point Light
+    
+    Update the shader to code to render the scene with a single point light this means that code specifically for directional lighting was changed and will need to be reimplemented. I will take time to research how to handle multiple lighting types in the same scene.
+    
+    Attenuation is currently not fully working (I think a vector isn't being normalized properly)
+    
+    Next step is to update the code to support multiple point lights and blend their colours if lights overlap
+
+commit 1cc790e4450395817f868465f1c71642671fd068
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 15:52:06 2025 +0000
+
+    Connected Light Variables To UI
+    
+    I am currently debating if I should keep the light material values as keeping them causes almost any code involving lighting to be two times larger and when changing light values it's inconvenient to change two values at a time.
+
+commit 8a15fc5fa827f6463b2950a0070616e6773d835d
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 15:12:54 2025 +0000
+
+    Directional Light Class
+    
+    Encapsulated directional light logic into it's own class.
+    
+    Now I need to consider how I will make the values editable in the UI at first I wanted to have public variables that could be easily edited but not only is this a big waste of memory it ImGui expects a float* to an array of 4 floats which wouldn't be clean at all. So instead I'll make getter functions that return a float*
+
+commit 73a842fac3e4d4ceb896637c3838a821ced12a73
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 14:01:41 2025 +0000
+
+    Seperated Light Data and Matrix Data into different buffers
+    
+    By separating the buffers less data needs to be uploaded to the GPU at a time as the only data that'd need to be updated are the world, view, and proj buffers.
+    
+    It also means lighting data is better grouped for when new lighting types are added which will be started on right now!
+
+commit 833913ec6341e945fabef57e35f086aa92774f50
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 13:21:14 2025 +0000
+
+    Texture Colour is no longer "Washed Out" by ambient
+    
+    Edited shader to properly sample the AO and Roughness maps to edit the ambient light and specular light values respectively.
+    
+    The bit depths of the other fool textures were also changed to 32 instead of 8 which means there is currently a lot of wasted memory. Consider fixing this if I have time.
+
+commit 9314143af82d1a95a6cdf3a0762173fb9baa2452
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 04:23:23 2025 +0000
+
+    Save Dolly Cam Data and Path
+    
+    The Save and Read JSON code is getting very very big and should be abstracted before lighting is worked on
+
+commit c1a7626ee97767d1625748e9ed6ee77b500dd5bd
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sat Nov 15 02:17:33 2025 +0000
+
+    Light Panel
+    
+    Created a light panel to prepare for work on creating point lights and spot lights.
+    
+    While going over the ImGui class I noticed some unclear values so added constexpr vars to avoid magic numbers
+
+commit 8529af2eb02c9d3eef5732266836de6bc172254d
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Nov 13 14:50:03 2025 +0000
+
+    Updated Fool's AO Map to be rgba32
+    
+    Before it only had a bit depth of 24 which caused artefacts on the texture
+
+commit f8c8929351313d7b06f1dfa708df2e1cf32c1f40
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Nov 13 14:43:20 2025 +0000
+
+    Fixed Sampler Init issue in Mesh
+    
+    Only the InitBuffer Function was being called not the Initialise Function so the sampler wasn't properly being created
+
+commit 8b0ea6238945b6dbdc472c44798d0c0bde43e24e
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Nov 13 14:36:53 2025 +0000
+
+    Experimented With Using AO Maps
+
+commit 75032ffb69a56beb7b4bc8bd82a03da98bbc110a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Nov 11 20:43:45 2025 +0000
+
+    Grouped Similar Systems Into VS Filters
+
+commit d17335788dcc4165a03914285c3f6977d7c8efef
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Nov 11 18:32:27 2025 +0000
+
+    Dolly Class
+    
+    Finished the dolly class from the previous commit.
+    
+    The User can set the points of the path the dolly will follow and either manually use A and D to move it along the path or toggle the m_moveAutomatically bool
+    
+    The Dolly still needs to be added to the saveing logic.
+
+commit dfdd5d1a83421587a2bc23699114e5d7136d77fb
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Nov 11 10:54:45 2025 +0000
+
+    Started Work on Dolly Camera
+    
+    Bezier curves are broken :<
+
+commit aad5ddd056bb4ff12ae2e9c2780845f11dffe11f
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Nov 10 21:33:34 2025 +0000
+
+    Save Debug Camera Specific Values
+
+commit 703519a6adac50567d525f21d04a8946c4599bcf
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Nov 10 19:09:00 2025 +0000
+
+    Skybox
+    
+    Created a skybox class that has its own vert and pixel shaders to sample a texture cube.
+    
+    The class takes in an array of 6 texture paths loads the image and creates a texture cube with them.
+    
+    The current textures used are a bit bright however consider changing them
+
+commit c8fde10dd7d19167eb858c78ee3b98bf4b71402e
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Nov 6 14:47:44 2025 +0000
+
+    Camera Position is Saved In JSON
+    
+    A vector containing all cameras in stored in the application class. They are stored as SmartPtrs to the BaseCamera class the so the vector can hold and access any camera type easily.
+    
+    When saving read the camera type in each vector class and only save the necessary data for each type eg. a regular cam doesn't need to store the camera sensitivity.
+    
+    When reading the JSON process the data and use make_shared to construct the class and place it into the vector.
+    
+    JSON Reading now is getting quite large and it may be time to move it to it's own class or namespace.
+
+commit 3a6df7708c6d0369f4daee336b6ca19ef6aa110a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Nov 4 11:42:14 2025 +0000
+
+    Camera Panning And Movement Relative to Forward
+    
+    Using the input class detect changes in the mouse position and update a yaw and pitch variable to rotate the m_at position.
+    
+    Instead of moving in hard coded directions the camera moves relative to the current forward direction.
+    
+    The current direction vectors for up, down, left, right, forward, back are stored as members for readability but is suboptimal as unused vectors can be calculated and more memory is taken up
+
+commit 8327b9d66a27d06992ba5b197282ba5ef2ae342f
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Nov 3 13:29:30 2025 +0000
+
+    Updated Input Class to handle Mouse pos and buttons
+    
+    The new functions are essentially just the same as the KeyFunctions but without a parameter. I'm not fully sure if this is good as it means there are multiple functions essentially doing the same thing but I also don't think it's intuitive to detect mouse input using a get key class. Maybe the two sets of mouse functions could be abstracted to a single set of functions that takes the mouse button as a parameter
+
+commit 889b1f6cff02aa3727b341379efd60d201eb5125
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Nov 3 12:34:27 2025 +0000
+
+    Updated Keyboard Class to Input Class
+    
+    The Keyboard class was relatively small so packing both Keyboard Input and Mouse Input into one class feels more convenient than having two separate classes
+
+commit 5e3f4013c066c93b7a72c5ea161175e71395fb1e
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Nov 2 19:25:58 2025 +0000
+
+    Added Camera Model
+    
+    To be used to discern the position of any cameras not currently in use.
+    
+    I may make it so these the camera models are affected by light
+
+commit ec5f8525910aea2dfcffe451da30530add1e874a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Nov 2 19:24:22 2025 +0000
+
+    Debug Fly Camera
+    
+    User can strafe using down all axis using WASDQE.
+    
+    m_pitch and m_yaw can be edited to alter the rotation of the camera these values will be used to connect mouse input to cam input.
+    
+    Right now the movement is hard coded and for the scope of this project that's fine but if I were to design a system where the user could edit keybinds I would use a command pattern and create functions like MoveCameraRight() and whenever the corresponding input is pressed trigger a function pointer
+
+commit 9f211b776ffe267508d861d673c092b95837a3d0
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Nov 2 15:27:48 2025 +0000
+
+    Keyboard Input Class
+    
+    Static class that can be called to activate logic on button input.
+    
+    GetKeyDown() returns true the frame the key is pressed
+    
+    GetKeyHeld() returns true as long as the key is held
+    
+    GetKeyUp() returns true the frame the key is released.
+    
+    Designed be like Unity and will be used for the debug fly camera. Once the debug fly cam has been completed  I will create a mouse class for handling Mouse events and movement
+
+commit 36762bb5531d753c1c08f176d850fb48669f5774
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Nov 2 13:44:34 2025 +0000
+
+    Base Camera Class
+    
+    Created a base class to hold camera values and construct a view and projection vector.
+    
+    In the future it may be worth adding and ortho matrix so the user can switch between perspective view and orthographic view.
+    
+    Next I will develop a Debug Fly Camera
+
+commit 69f7032e7286b06e7974fb404307604d39de4d9c
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Nov 2 12:26:03 2025 +0000
+
+    Moved Model Class Rendering To Application Layer
+    
+    For simplicity model class rendering was done in just the directX layer as there are a lot less moving parts and I could focus on rendering now it's complete it gets moved to the application layer
+
+commit 4fd28bae58aff025e18f08203214bb890af25e50
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Wed Oct 29 10:08:33 2025 +0000
+
+    Removed Model Class texture member
+    
+    Left in accidentally from the old texturing approach.
+
+commit c8d44b878a3ad247b899068abb38e5e6a4861d43
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Wed Oct 29 09:49:49 2025 +0000
+
+    Added Blinn-Phong
+    
+    The last commit accidentally undid the blinn-phong code
+
+commit a93646cf31b4728f3b297140c46e630f10bbc336
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Wed Oct 29 09:48:33 2025 +0000
+
+    Added Blinn-Phong
+    
+    I could implement a way to switch between the two lighting models but Blinn is better at handling edges and supposedly is more efficient.
+    
+    Adding the option to switch would slow down rendering with no worthwhile payoff imo
+
+commit c1e3b80ba81f018a8bc28568ed5031337ab93fea
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Wed Oct 29 09:45:43 2025 +0000
+
+    Added Blinn-Phong
+
+commit 413674df41ae6bd187d4ad5c8423cfe2216b5ced
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Wed Oct 29 01:11:47 2025 +0000
+
+    Read multiple textures per mesh
+
+commit 6a4e680b5b69b8123a5f1d612648fdbdb7c6d30a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Oct 28 15:05:29 2025 +0000
+
+    Load multiple textures per model
+    
+    Each mesh class holds a vector of textures it will use in rendering. Currently they only store the Base Colour.
+    
+    The texture communication between mesh and model classes is a bit weird and requires quite a lot of copying.
+
+commit 17cd76f78c81dcf5ded6dcf0d32a1b0e76844438
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 28 09:45:51 2025 +0000
+
+    Fixed incorrect shader Texcoords
+    
+    Previously the Texcoords were set to (0,0) before texturing was implemented and that code never got updated till now :p
+
+commit a6428d301336d359ffc93fe1e390b447167da8c7
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 28 09:38:47 2025 +0000
+
+    Model Loader Loads Model With No Holes
+    
+    I didn't ever find the root cause of the depth buffer issue. The buffer was immediately being set to 0 when anything was drawn but the more common fixes didn't work.
+    
+    It wasn't a waste of time though as I feel a lot more comfortable with shaders and they feel a lot less black box now
+
+commit 28b90e30addabfa4a4b0f1ba77f1c80846178239
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Oct 28 08:36:36 2025 +0000
+
+    Started Reworking Model and Mesh Classes
+    
+    I had to go to class :<<<<<<<<
+
+commit be9fcdd110910456f3869d0bae8f53beae7fa32e
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Oct 27 12:01:25 2025 +0000
+
+    Created Application Layer
+    
+    Separated application side code into it's own class. This allowed for DX11Framework and Application Layer to be MOSTLY decoupled but coupling remains in areas like viewport rendering and UI Input detection
+
+commit e6b687c319a6c1fc0e559142bdc49ac7c269ba8f
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Oct 26 17:52:04 2025 +0000
+
+    Model and Textures paths are saved to JSON
+    
+    The current storage for texture path is ok for now but will need to be reworked when multiple textures are used on an object.
+
+commit b592873803ad58ff7a8a078bc8f9231a24a57536
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Oct 23 14:52:42 2025 +0100
+
+    Saves Level data to file as float instead of int
+    
+    There's a bug when trying to read the current saved data I need to look into it next.
+
+commit 633a3aeedf1f54ee4413d2411d0f79e6f1456bcd
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Oct 23 14:49:13 2025 +0100
+
+    Write SceneData to JSON when saved
+    
+    Reads the current object data in the scene and saves them to a JSON of the specified path.
+    
+    The reading of OBJ data is a little messy so it might be worth cleaning it up.
+
+commit 25d543f0a86e05cf792962d251bbd2052cfdf46f
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Oct 23 13:20:28 2025 +0100
+
+    Game Objects Hold Name Variable
+    
+    Next will develop the ability to update the JSON to match the current scene
+
+commit 94e87ebe2aa4d82a4ba2ead5b627542c77fad351
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 21 10:06:01 2025 +0100
+
+    Populate Object Vector Using JSON
+    
+    ReadJson() populates the scene and sets the transforms of any objects read.
+    
+    I think it's coming to the point where an extra layer between DirectX and the application would be helpful as the currect DX class is getting quite big.
+    
+    GameObject could also do with a name member to prepare it for the UI.
+
+commit 74007b31d4cf5d4bffb01c765dad1b4e40860201
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 14 03:27:37 2025 +0100
+
+    Connected GameObjects to world
+    
+    User can add new objs using the "New" button.
+    
+    KNOWN BUG: engine crashes if objs in the scene are larger than the reserved object vector size
+
+commit 6137762287b4b52bdeb1acef3c7dbdc5ddf5aa84
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 14 02:16:30 2025 +0100
+
+    Decoupled Rendering to Object Class
+    
+    Isn't properly connected to the GUI
+    
+    ModelClass could hold texture shader class in future to reduce coupling.
+    
+    Yet to have hierarchy implementation.
+
+commit 9a9a532d5843fc30ab2c6336b8fd7c1603d090b7
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 14 00:42:27 2025 +0100
+
+    Transform Component stores transform as Vec3s
+    
+    This was done for simplicity as matrices made the code less readable and paused progress.
+    
+    Vec3 approach is more memory efficient but slower at computing but the matrix takes more memory but doesn't require rebuilding the matrices.
+    
+    Maybe a hybrid approach that only rebuilds the matrix if necessary could work?
+
+commit 8ded92d4c634e4a2cf5da69fa9a7a8ff5b503cf2
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 14 00:26:09 2025 +0100
+
+    Fixed EulGetOrd Macrio
+
+commit 6c02e31ffde86ffda0865d32a5810bb4cc40cd60
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Oct 13 22:43:48 2025 +0100
+
+    Edited incorrect Matrix To Euler Logic
+    
+    The previous implementation used the wrong elements in some calculations
+
+commit 55fc76eba989f6c6cc24f58e1a4ebe933955d4f8
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Oct 13 22:06:19 2025 +0100
+
+    Rotation Matrix to euler angles
+
+commit a698b627f33c8c7bf30cfef797e58772e8710dfa
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Oct 13 02:02:46 2025 +0100
+
+    Scale & Transform editable with GUI
+    
+    Rotation is currently broken and trying to alter currently will break scaling
+
+commit 959de17096523beffe7bd530dfcef4c8d39359ea
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Oct 12 23:04:20 2025 +0100
+
+    Commented TransformComp
+    
+    Some commenting might be redundant like each X, Y, and Z input will be assumed to be the same unit.
+
+commit d153038ec6c7145f30a34cbd47f2749058ab7d53
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Oct 12 22:48:53 2025 +0100
+
+    Transform Component
+    
+    Transform component to be used in the future game object class.
+    
+    Holds a FLOAT4X4 transformation matrix which can be updated through Euler angle input and the corresponding Translate, Rotate, and Scale funcs.
+    
+    translation, rotation, and scale vectors can be read as Euler angles using the corresponding Get(Transformation)Vector func.
+    
+    Could possibly be optimised by reducing copy construction.
+
+commit c1c6e8a6211acefb38f0a289a5d3cd8ae0171095
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sat Oct 11 17:37:28 2025 +0100
+
+    Revert "Fixed DEVICE_DRAW_INDEX_BUFFER_TOO_SMALL"
+    
+    Removed any accidentally included changes commit
+
+commit dbeca61364fe5cf17e3af65a46a7bed6dad7d69a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sat Oct 11 00:52:06 2025 +0100
+
+    Fixed DEVICE_DRAW_INDEX_BUFFER_TOO_SMALL
+    
+    Texture shader class was attempting to use DrawIndexed() even though the IBuffer and VBuffer hasn't been set.
+
+commit ccb6a7c30a0fa79d03082a1b822f0f7ffa54cbde
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sat Oct 11 00:20:49 2025 +0100
+
+    Flipped Viewport image so it isn't upside down
+
+commit 3a18668f2376634016ca7605bbd1c14e2c220f8a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Fri Oct 10 12:49:21 2025 +0100
+
+    Moved Models folder into ProjectDir
+
+commit 392b293cebcb6000ba730f9eb1abb86fd1e792f6
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Fri Oct 10 02:44:53 2025 +0100
+
+    Removed Lighting
+
+commit 009c4ab3492c59a2989943fe79cebd344d3aa80e
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Fri Oct 10 02:41:47 2025 +0100
+
+    Moved SetBackBuffer to Render()
+
+commit fbfb798598f8144ad69c5a74fa2a47b8948e93da
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Wed Oct 8 03:33:29 2025 +0100
+
+    Model Class holds a vector of meshes
+
+commit 23ac46c4381006e4143316b945a69ebfd9425421
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Wed Oct 8 01:47:12 2025 +0100
+
+    Abstracted Buffers into Mesh Class
+
+commit 8f0139b2c013417699cf1df3515fa18c9099d713
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 7 10:05:43 2025 +0100
+
+    Removed redundant comments
+
+commit 0d5a0a28451b0de45ddcfd5df2ba20d90acfb6c7
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Oct 7 09:13:15 2025 +0100
+
+    Rotation angles are converted to radians in transformation
+
+commit b6984ae0ee30ad0d5895f0481e5395e12e300efb
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Oct 6 23:42:51 2025 +0100
+
+    Render model with multiple nodes
+
+commit ccff076ed228e67534bed423696cbeeb68a045e4
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Oct 6 13:47:30 2025 +0100
+
+    Added Iggy and Lain models
+
+commit 5de890842187eafc3e98e994eb03a73303c5cb14
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Thu Oct 2 23:06:09 2025 +0100
+
+    Render Screen As a Texture
+
+commit 75fd29791f4185ffc152317b17a506c503fe857a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Thu Oct 2 22:58:06 2025 +0100
+
+    Decoupled Transform Panel
+
+commit 3eb79344589d1d284a6af1d02f7b35a1f0689e21
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Oct 2 14:44:14 2025 +0100
+
+    Backbuffer Implemented
+
+commit 8da60c00f077bede2d4a9b90588301c1a6fc69cf
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Thu Oct 2 13:16:53 2025 +0100
+
+    Created RenderTextureClass
+    
+    To render the backbuffer data in the viewport
+
+commit 638dc27fabb4f79bc2cf348d282f2676d77cdb5f
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 15:32:31 2025 +0100
+
+    ImGui Docking Implementation
+
+commit 4bbb66af057051e61b52d7383695b92dccb4342d
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 15:19:01 2025 +0100
+
+    Fixed Model Class Memory Leak
+    
+    Shutdown function was not being called in destructor
+
+commit ff8e543a8bc106f5bb6ab7be6646dc20bc7cf6f5
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 15:04:47 2025 +0100
+
+    Removed Accidental Global Vars
+
+commit 90c509fbff38c87bb3e2af4921f86786d97bf514
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 14:30:14 2025 +0100
+
+    Change model using UI
+
+commit 58864a477580969d6441647e2ac3c760b4f56810
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 13:23:53 2025 +0100
+
+    VS Filters For ImGui Files
+
+commit 9fa81bf306e3f5b1778d4a426c3f7ae364af7125
+Author: Heather Carter <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 09:58:15 2025 +0100
+
+    UI can change the transformation of object
+
+commit 342cd8a074022abb6ba60abe0bed52f7cfb8b3fd
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 08:24:46 2025 +0100
+
+    Unfinished Implementation of UIWrapper
+
+commit 2db17f3c657cb546034d7ffa15c5314a0ae03512
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Tue Sep 30 08:13:31 2025 +0100
+
+    Added ImGui
+    
+    (docking branch)
+
+commit 7293faeeeb389740fafeede78a02ad93ffe6a972
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Sep 29 23:14:41 2025 +0100
+
+    Point Lights
+
+commit 472fbaf21eae862a5602b1492258c678ca96f5b8
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Sep 29 12:26:35 2025 +0100
+
+    Improved commenting on public functions
+
+commit 7f74349e868174cd9184635f09039c1d049ed994
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Sep 29 11:44:56 2025 +0100
+
+    Render Textured Models
+
+commit 80b2f82885ea83eb2c60dd51cc2e0216de297e77
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Mon Sep 29 10:52:26 2025 +0100
+
+    Included Primitive Objects
+    
+    As seen in Blender:
+    -Sphere
+    -Plane
+    -Cube
+    -Torus
+    -Cone
+    -Cylinder
+
+commit 60b291fb2676bf2e7089102d961705a902b4316a
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Sep 28 17:22:19 2025 +0100
+
+    Added Assimp
+
+commit 29949f7438c3e692c78db2e1bde70e4d47050c8b
+Author: barter127 <heathercarter2006@outlook.com>
+Date:   Sun Sep 28 14:17:02 2025 +0100
+
+    Included External Classes
+
+commit c3d719533c0a95c7c46bdb562f87b392cad4e026
+Author: github-classroom[bot] <66690702+github-classroom[bot]@users.noreply.github.com>
+Date:   Wed Sep 3 10:47:29 2025 +0000
+
+    Initial commit

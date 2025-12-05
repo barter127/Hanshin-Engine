@@ -1,0 +1,46 @@
+# Blender MTL File: 'iggy 04.blend'
+# Material Count: 3
+
+newmtl base
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump Models/Iggy/base_Normal.png
+map_Kd Models/Iggy/base_BaseColor.png
+map_Ns Models/Iggy/base_Roughness.png
+map_Ka Models\Iggy\base_Ambient_Occlusion.png
+
+newmtl fool
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump Models/Iggy/fool_Normal.png
+map_Kd Models/Iggy/fool_BaseColor.png
+map_Ns Models/Iggy/fool_Roughness.png
+map_d Models/Iggy/fool_BaseColor.png
+map_Pm Models/Iggy/fool_Metallic.png
+map_Ka Models\Iggy\fool_Ambient_Occlusion.png
+
+newmtl iggy
+Ns 14.578512
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 2.000000 Models/Iggy/iggy_Normal.png
+map_Kd Models/Iggy/iggy_BaseColor.png
+map_Ns Models/Iggy/iggy_Roughness.png
+map_Ka Models\Iggy\iggy_Ambient_Occlusion.png

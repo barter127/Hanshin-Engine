@@ -1,0 +1,47 @@
+{
+  "GameObjects": [
+    {
+      "BaseColourPath": "Models/Iggy/fool_BaseColor.png",
+      "ModelPath": "Models/Camera.obj",
+      "Name": "Iggy",
+      "PosX": -0.4000000059604645,
+      "PosY": -1.0,
+      "PosZ": 0.0,
+      "RotX": 0.0,
+      "RotY": 155.39999389648438,
+      "RotZ": 0.0,
+      "ScaleX": 1.0,
+      "ScaleY": 1.0,
+      "ScaleZ": 1.0
+    },
+    {
+      "BaseColourPath": "stone01.tga",
+      "ModelPath": "Primitives/Prim_Cube.obj",
+      "Name": "Cube",
+      "PosX": 4.400000095367432,
+      "PosY": 1.7999999523162842,
+      "PosZ": 0.0,
+      "RotX": 0.0,
+      "RotY": 44.0,
+      "RotZ": 0.0,
+      "ScaleX": 1.0,
+      "ScaleY": 1.0,
+      "ScaleZ": 1.0
+    },
+    {
+      "BaseColourPath": "stone01.tga",
+      "ModelPath": "Primitives/Prim_Cone.obj",
+      "Name": "Cone",
+      "PosX": -4.0,
+      "PosY": 1.7999999523162842,
+      "PosZ": 0.0,
+      "RotX": 0.0,
+      "RotY": 44.0,
+      "RotZ": 0.0,
+      "ScaleX": 1.0,
+      "ScaleY": 1.0,
+      "ScaleZ": 1.0
+    }
+  ],
+  "SceneName": "Osaka"
+}

@@ -1,0 +1,38 @@
+{
+  "GameObjects": 
+  [
+    {
+      "ModelPath": "Primitives/Prim_Cube.obj",
+      "BaseColourPath": "stone01.tga",
+
+      "Name": "Cube",
+
+      "PosX": 0.0,
+      "PosY": 0.0,
+      "PosZ": -250.0,
+      "RotX": 0.0,
+      "RotY": 0.0,
+      "RotZ": 0.0,
+      "ScaleX": 1.0,
+      "ScaleY": 1.0,
+      "ScaleZ": 1.0
+    },
+    {
+      "ModelPath": "Primitives/Prim_Cone.obj",
+      "BaseColourPath": "stone01.tga",
+
+      "Name": "Cone",
+
+      "PosX": -3.0,
+      "PosY": 1.0,
+      "PosZ": -250.0,
+      "RotX": 0.0,
+      "RotY": 0.0,
+      "RotZ": 0.0,
+      "ScaleX": 2.0,
+      "ScaleY": 3.0,
+      "ScaleZ": 1.0
+    }
+  ],
+  "SceneName": "Osaka"
+}
