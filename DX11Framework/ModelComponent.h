@@ -4,12 +4,15 @@
 #include <d3d11.h>
 #include <directxmath.h>
 #include <vector>
+#include <unordered_map>
+#include <memory>
 
 #include <assimp\Importer.hpp>
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
 
 #include "ConstantBuffer.h"
+#include "TextureFlyweight.h"
 
 class TextureClass;
 class Mesh;

@@ -172,6 +172,7 @@
     <ClCompile Include="RenderTextureClass.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="TextureClass.cpp" />
+    <ClCompile Include="TextureFlyweight.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +221,7 @@
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TextureClass.h" />
+    <ClInclude Include="TextureFlyweight.h" />
     <ClInclude Include="TransformComponent.h" />
   </ItemGroup>
   <ItemGroup>

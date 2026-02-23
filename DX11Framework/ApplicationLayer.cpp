@@ -179,9 +179,9 @@ void ApplicationLayer::Draw(MatrixBuffer& mb, DX11Framework* dx)
 
     m_ui->ViewportUpdate(m_DevConPtr.Get());
 
-    m_ui->BlurredViewportStart(m_DevicePtr.Get(), m_DevConPtr.Get());
-    m_ui->GaussianBlur(m_DevConPtr.Get());
-    m_ui->BlurredViewportUpdate(m_DevConPtr.Get());
+    //m_ui->BlurredViewportStart(m_DevicePtr.Get(), m_DevConPtr.Get());
+    //m_ui->GaussianBlur(m_DevConPtr.Get());
+    //m_ui->BlurredViewportUpdate(m_DevConPtr.Get());
 
     dx->SetBackBufferRenderTarget();
     dx->ResetViewport();

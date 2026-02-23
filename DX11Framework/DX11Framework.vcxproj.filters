@@ -134,6 +134,9 @@
     <ClCompile Include="Blurring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TextureFlyweight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX11Framework.h">
@@ -227,6 +230,9 @@
       <Filter>Header Files\Lighting</Filter>
     </ClInclude>
     <ClInclude Include="Blurring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureFlyweight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

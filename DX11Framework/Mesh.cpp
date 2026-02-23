@@ -89,10 +89,7 @@ bool Mesh::InitBuffers(ID3D11Device* device)
 	vertices = new VertexType[m_vertices.size()];
 
 	// Load the vertex array with data.
-	for (int i = 0; i < m_vertices.size(); i++)
-	{
-		vertices[i] = m_vertices[i];
-	}
+	std::copy(m_vertices.begin(), m_vertices.end(), vertices);
 
 	D3D11_BUFFER_DESC vertexBufferDesc = {};
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertices.size() ;
@@ -108,10 +105,7 @@ bool Mesh::InitBuffers(ID3D11Device* device)
 	indices = new UINT[m_indices.size()];
 
 	// Load the index array with data.
-	for (int i = 0; i < m_indices.size(); i++)
-	{
-		indices[i] = m_indices[i];
-	}
+	std::copy(m_indices.begin(), m_indices.end(), indices);
 
 	D3D11_BUFFER_DESC indexBufferDesc = {};
 	indexBufferDesc.ByteWidth = sizeof(UINT) * m_indices.size();
