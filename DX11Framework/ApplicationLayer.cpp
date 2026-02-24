@@ -20,6 +20,7 @@
 using json = nlohmann::json;
 
 using namespace DirectX;
+using namespace std;
 using Microsoft::WRL::ComPtr;
 
 bool ApplicationLayer::Initialise(ID3D11Device* device, ID3D11DeviceContext* devCon, HWND windowHandle)
@@ -46,7 +47,7 @@ bool ApplicationLayer::Initialise(ID3D11Device* device, ID3D11DeviceContext* dev
 
     m_skybox->Initialise(device, devCon, windowHandle, skyboxTexturePaths);
 
-    ReadJson("CameraSaveTest.json");
+    LoadScene("CameraSaveTest.json");
 
     m_pointLight = new PointLight({ 1.0f, 1.0f, 1.0f,1.0f }, { 0.1f, 0.1f, 0.1f, 1.0f },
         { 1.0f, 1.0f, 1.0f, 1.0f }, 10,
@@ -62,22 +63,6 @@ bool ApplicationLayer::Initialise(ID3D11Device* device, ID3D11DeviceContext* dev
         { 1.0f, 1.0f, 1.0f, 1.0f }, 10,
         { 0.0f, 1.0f, -1.0f });
     m_dirLight->Initialise(device);
-        
-
-    // Child to Iggy and the Fool.
-    m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
-    m_objVector.back()->LoadModel(device, devCon, (char*)"Primitives/Prim_Cube.obj", (char*)"stone01.tga");
-    m_objVector.back()->m_transform->m_position = { 2, 1, -10 };
-    m_objVector[0]->AddChild(m_objVector.back().get());
-
-    // Child to just created cube
-    m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
-    m_objVector.back()->LoadModel(device, devCon, (char*)"Primitives/Prim_Torus.obj", (char*)"stone01.tga");
-    m_objVector.back()->m_transform->m_position = { 2, 1, -10 };
-    int lastObjectIndex = m_objVector.size() - 2;
-    m_objVector[lastObjectIndex]->AddChild(m_objVector.back().get());
-
-    m_objVector[0]->AddChild(m_objVector.back().get());
 
     return true;
 }
@@ -154,7 +139,7 @@ void ApplicationLayer::Update(float deltaTime)
 
     if (m_ui->SaveChanges())
     {
-        WriteJson("CameraSaveTest.json");
+        SaveScene("CameraSaveTest.json");
     }
 }
 
@@ -200,271 +185,174 @@ void ApplicationLayer::CreateNewObject(char* modelPath, char* texturePath)
     bool result = m_objVector.back()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), modelPath, texturePath);
 }
 
-bool ApplicationLayer::ReadJson(std::string path)
+bool ApplicationLayer::LoadScene(string path)
 {
-    json jFile;
+	auto ReadXMFloat3 = [](const string name, const json& desc)
+	{
+		json jsonVector = desc[name];
 
-    std::ifstream fileOpen(path);
+		float x = jsonVector["X"], y = jsonVector["Y"], z = jsonVector["Z"];
 
-    if (fileOpen.fail())
-    {
-        return false;
-    }
+		return XMFLOAT3(x, y, z);
+	};
 
-    jFile = json::parse(fileOpen);
+	json jFile;
+	std::ifstream fileOpen(path);
+	if (fileOpen.fail())
+	{
+		return false;
+	}
 
-    std::string SceneName = jFile["SceneName"].get<std::string>();
-    m_activeCamera = jFile["Active Cam"].get<int>();
+	jFile = json::parse(fileOpen);
 
-    json& objects = jFile["GameObjects"];
+	std::string SceneName = jFile["SceneName"].get<std::string>();
+	m_activeCamera = jFile["Active Cam"].get<int>();
 
-    int size = objects.size();
-    m_objVector.reserve(size);
-    for (int i = 0; i < size; i++)
-    {
-        XMFLOAT3 translation, rotation, scale;
+	json& objects = jFile["GameObjects"];
 
-        json& objectDesc = objects.at(i);
-        std::string modelPath = objectDesc["ModelPath"];
-        std::string texturePath = objectDesc["BaseColourPath"];
+	int size = objects.size();
+	m_objVector.reserve(size);
+	for (int i = 0; i < size; i++)
+	{
+		//Vector3 translation, rotation, scale;
 
-        std::string objName = objectDesc["Name"];
+		json& objectDesc = objects.at(i);
+		std::string modelPath = objectDesc["ModelPath"];
+		std::string objName = objectDesc["Name"];
 
-        // Maybe it's worth creating a read JSON Vector function to clean up sections like this.
-        translation.x = objectDesc["PosX"]; translation.y = objectDesc["PosY"]; translation.z = objectDesc["PosZ"];
-        rotation.x = objectDesc["RotX"]; rotation.y = objectDesc["RotY"]; rotation.z = objectDesc["RotZ"];
-        scale.x = objectDesc["ScaleX"]; scale.y = objectDesc["ScaleY"]; scale.z = objectDesc["ScaleZ"];
+		m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
+		m_objVector.back().get()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)modelPath.c_str(), (char*)"stone01.tga");
+		m_objVector[i]->m_name = objName;
 
-        m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
-        m_objVector[i]->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)modelPath.c_str(), (char*)texturePath.c_str());
-        m_objVector[i]->m_name = objName;
+		TransformComponent* transform = m_objVector.back()->m_transform;
+		transform->m_position = ReadXMFloat3("Position", objectDesc);
+		transform->m_rotation = (ReadXMFloat3("Rotation", objectDesc));
+		transform->m_scale = ReadXMFloat3("Scale", objectDesc);
+	}
 
-        m_objVector[i]->m_transform->m_position = translation;
-        m_objVector[i]->m_transform->m_rotation = rotation;
-        m_objVector[i]->m_transform->m_scale = scale;
-    }
+	json& cams = jFile["Cameras"];
+	size = cams.size();
+	m_camVector.reserve(size);
+	for (int i = 0; i < size; i++)
+	{
+		json& camDesc = cams.at(i);
 
-    json& cams = jFile["Cameras"];
-    size = cams.size();
-    m_camVector.reserve(size);
-    for (int i = 0; i < size; i++)
-    {
-        XMFLOAT3 eye, at, up;
+		std::string camType = camDesc["Camera Type"];
 
-        json& camDesc = cams.at(i);
+		XMFLOAT3 eye = ReadXMFloat3("Eye", camDesc);
+		XMFLOAT3 at = ReadXMFloat3("At", camDesc);
+		XMFLOAT3 up = ReadXMFloat3("Up", camDesc);
 
-        std::string camType = camDesc["Camera Type"];
+		if (camType == "Base")
+		{
+			m_camVector.push_back(std::make_shared<BaseCamera>(eye, at, up,
+				1280, 768, 0.01f, 100.0f));
+		}
+		else if (camType == "Debug")
+		{
+			float yaw = camDesc["Yaw"];
+			float pitch = camDesc["Pitch"];
+			float sensitivity = camDesc["Sensitivity"];
+			float speed = camDesc["Speed"];
 
-        eye.x = camDesc["EyeX"]; eye.y = camDesc["EyeY"]; eye.z = camDesc["EyeZ"];
-        at.x = camDesc["AtX"]; at.y = camDesc["AtY"]; at.z = camDesc["AtZ"];
-        up.x = camDesc["UpX"]; up.y = camDesc["UpY"]; up.z = camDesc["UpZ"];
+			std::shared_ptr<DebugCamera> debugPtr = std::make_shared<DebugCamera>(eye, at, up,
+				1280, 768, 0.01f, 100.0f);
+			debugPtr->Initialise(yaw, pitch, sensitivity, speed);
 
-        if (camType == "Base")
-        {
-            m_camVector.push_back(std::make_shared<BaseCamera>(eye, at, up,
-                1280, 768, 0.01f, 100.0f));
-        }
-        else if (camType == "Debug")
-        {
-            float yaw = camDesc["Yaw"];
-            float pitch = camDesc["Pitch"];
-            float sensitivity = camDesc["Sensitivity"];
-            float speed = camDesc["Speed"];
-
-            std::shared_ptr<DebugCamera> debugPtr = std::make_shared<DebugCamera>(eye, at, up,
-                1280, 768, 0.01f, 100.0f);
-            debugPtr->Initialise(yaw, pitch, sensitivity, speed);
-
-            m_camVector.push_back(debugPtr);
-        }
-        else if (camType == "Dolly")
-        {
-            std::shared_ptr<DollyCamera> dollyPtr = std::make_shared<DollyCamera>(eye, at, up,
-                1280, 768, 0.01f, 100.0f);
-            
-            float speed = camDesc["Speed"];
-            bool automatic = camDesc["MoveAutomatically"];
-            bool retrace = camDesc["RetraceTrack"];
-
-            dollyPtr->Initialise(speed, automatic, retrace);
-
-            int pathSize = camDesc["PathSize"];
-
-            json& path = camDesc["Path"];
-            for (int i = 0; i < pathSize; i++)
-            {
-                json& point = path.at(i);
-
-                float x = point["X"];
-                float y = point["Y"];
-                float z = point["Z"];
-
-                dollyPtr->AddPoint(XMFLOAT3(x, y, z), i);
-            }
-            m_camVector.push_back(dollyPtr);
-        }
-    }
-    return true;
+			m_camVector.push_back(debugPtr);
+		}
+	}
+	return true;
 }
 
-bool ApplicationLayer::WriteJson(std::string path)
+bool ApplicationLayer::SaveScene(string path)
 {
-    std::ofstream fileWrite(path);
+	auto SaveXMFloat3 = [](const string name, const XMFLOAT3& vector)
+		{
+			return json(
+				{
+					name, {
+					{"X", vector.x },
+					{"Y", vector.y },
+					{"Z", vector.z },
+					}
+				});
+		};
 
-    json gameObjectsJson = json::array();
+	std::ofstream fileWrite(path);
 
-    for (int i = 0; i < m_objVector.size(); i++)
-    {
-            std::string modelPath = m_objVector[i]->m_modelPath;
-            std::string baseColourPath = m_objVector[i]->m_texturePath;
-            std::string name = m_objVector[i]->m_name;
+	json gameObjectsJson = json::array();
 
-            float posX = m_objVector[i]->m_transform->m_position.x;
-            float posY = m_objVector[i]->m_transform->m_position.y;
-            float posZ = m_objVector[i]->m_transform->m_position.z;
-            float rotX = m_objVector[i]->m_transform->m_rotation.x;
-            float rotY = m_objVector[i]->m_transform->m_rotation.y;
-            float rotZ = m_objVector[i]->m_transform->m_rotation.z;
-            float scaleX = m_objVector[i]->m_transform->m_scale.x;
-            float scaleY = m_objVector[i]->m_transform->m_scale.y;
-            float scaleZ = m_objVector[i]->m_transform->m_scale.z;
+	for (int i = 0; i < m_objVector.size(); i++)
+	{
+		std::string modelPath = m_objVector[i]->m_modelPath;
+		std::string name = m_objVector[i]->m_name;
 
-        gameObjectsJson.push_back(json::object(
-            {
-                    {"ModelPath", modelPath},
-                    {"BaseColourPath", baseColourPath},
+		TransformComponent* transform = m_objVector[i]->m_transform;
+		
+		gameObjectsJson.push_back(json::object(
+			{
+					{"ModelPath", modelPath},
+					// {"BaseColourPath", baseColourPath},
 
-                    {"Name", name},
+					{"Name", name},
 
-                    {"PosX", posX},
-                    {"PosY", posY},
-                    {"PosZ", posZ},
-                    {"RotX", rotX},
-                    {"RotY", rotY},
-                    {"RotZ", rotZ},
-                    {"ScaleX", scaleX},
-                    {"ScaleY", scaleY},
-                    {"ScaleZ", scaleZ},
-            }));
-    }
+					SaveXMFloat3("Position", transform->m_position),
+					SaveXMFloat3("Rotation", transform->m_rotation),
+					SaveXMFloat3("Scale", transform->m_scale),
+			}));
+	}
 
-    json camerasJson = json::array();
-    for (std::shared_ptr<BaseCamera> cam : m_camVector)
-    {
-        std::string camType = cam->GetType();
+	json camerasJson = json::array();
+	for (std::shared_ptr<BaseCamera> cam : m_camVector)
+	{
+		std::string camType = cam->GetType();
 
-        float eyeX = cam->GetEye().x;
-        float eyeY = cam->GetEye().y;
-        float eyeZ = cam->GetEye().z;
-        float atX = cam->GetAt().x;
-        float atY = cam->GetAt().y;
-        float atZ = cam->GetAt().z;
-        float upX = cam->GetUp().x;
-        float upY = cam->GetUp().y;
-        float upZ = cam->GetUp().z;
 
-        if (camType == "Base")
-        {
-            camerasJson.push_back(json::object(
-                {
-                    {"Camera Type", camType},
+		if (camType == "Base")
+		{
+			camerasJson.push_back(json::object(
+				{
+					{"Camera Type", camType},
 
-                    {"EyeX", eyeX},
-                    {"EyeY", eyeY},
-                    {"EyeZ", eyeZ},
-                    {"AtX", atX},
-                    {"AtY", atY},
-                    {"AtZ", atZ},
-                    {"UpX", upX},
-                    {"UpY", upY},
-                    {"UpZ", upZ}
-                }));
-        }
+					SaveXMFloat3("Eye", cam->GetEye()),
+					SaveXMFloat3("At", cam->GetAt()),
+					SaveXMFloat3("Up", cam->GetUp()),
+				}));
+		}
 
-        else if (camType == "Debug")
-        {
-            DebugCamera* debugCam = (DebugCamera*)cam.get();
+		else if (camType == "Debug")
+		{
+			DebugCamera* debugCam = (DebugCamera*)cam.get();
 
-            float yaw = debugCam->GetYaw();
-            float pitch = debugCam->GetPitch();
-            float speed = debugCam->m_speed;
-            float sensitivty = debugCam->m_sensitivity;
+			float yaw = debugCam->GetYaw();
+			float pitch = debugCam->GetPitch();
+			float speed = debugCam->m_speed;
+			float sensitivty = debugCam->m_sensitivity;
 
-            camerasJson.push_back(json::object(
-                {
-                    {"Camera Type", camType},
+			camerasJson.push_back(json::object(
+				{
+					{"Camera Type", camType},
 
-                    {"EyeX", eyeX},
-                    {"EyeY", eyeY},
-                    {"EyeZ", eyeZ},
-                    {"AtX", atX},
-                    {"AtY", atY},
-                    {"AtZ", atZ},
-                    {"UpX", upX},
-                    {"UpY", upY},
-                    {"UpZ", upZ},
+					SaveXMFloat3("Eye", cam->GetEye()),
+					SaveXMFloat3("At", cam->GetAt()),
+					SaveXMFloat3("Up", cam->GetUp()),
 
-                    {"Yaw", yaw},
-                    {"Pitch", pitch},
+					{"Yaw", yaw},
+					{"Pitch", pitch},
 
-                    {"Speed", speed},
-                    {"Sensitivity", sensitivty}
-                }));
-        }
+					{"Speed", speed},
+					{"Sensitivity", sensitivty}
+				}));
+		}
 
-        else if (camType == "Dolly")
-        {
-            DollyCamera* dollyCam = (DollyCamera*)cam.get();
+		fileWrite << json::object({
+			{"GameObjects", gameObjectsJson},
+			{"Cameras", camerasJson},
+			{"Active Cam", m_activeCamera},
+			{"SceneName", "Osaka"},
+			}).dump(2) << std::endl;
 
-            json dollyPath = json::array();
-            int pathSize = dollyCam->GetPathSize();
-
-            // TODO: Super duper cache unfriendly fix if I have time.
-            for (int i = 0; i < pathSize; i++)
-            {
-                XMFLOAT3 point = dollyCam->GetPoint(i);
-
-                dollyPath.push_back(json::object(
-                    {
-                        { "X", point.x },
-                        { "Y", point.y },
-                        { "Z", point.z }
-                    }));
-            }
-
-            json cameraObj = json::object({
-                {"Camera Type", camType},
-
-                {"EyeX", eyeX},
-                {"EyeY", eyeY},
-                {"EyeZ", eyeZ},
-                {"AtX", atX},
-                {"AtY", atY},
-                {"AtZ", atZ},
-                {"UpX", upX},
-                {"UpY", upY},
-                {"UpZ", upZ},
-
-                {"Speed", dollyCam->m_speed },
-                {"RetraceTrack", dollyCam->m_retraceTrack },
-                {"MoveAutomatically", dollyCam->m_moveAutomatically },
-
-                { "Path", dollyPath },
-                { "PathSize", pathSize }
-                });
-
-            camerasJson.push_back(cameraObj);
-        }
-
-        // Add anymore types down here.
-    }
-
-    fileWrite << json::object({
-        {"GameObjects", gameObjectsJson},
-        {"Cameras", camerasJson},
-        {"Active Cam", m_activeCamera},
-        {"SceneName", "Osaka"},
-        }).dump(2) << std::endl;
-
-    return true;
+		return true;
+	}
 }

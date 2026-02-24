@@ -29,8 +29,8 @@ public:
 
 private:
 	void CreateNewObject(char* modelPath, char* texturePath);
-	bool ReadJson(std::string path);
-	bool WriteJson(std::string path);
+	bool LoadScene(std::string path);
+	bool SaveScene(std::string path);
 
 	ImGuiWrapper* m_ui;
 
