@@ -2,6 +2,7 @@
 #define MESH_CLASS_H_
 
 #include <vector>
+#include <memory>
 
 #include <d3d11.h>
 #include <directxmath.h>
@@ -23,7 +24,7 @@ public:
 
 public:
 	Mesh();
-	Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<TextureClass> textures);
+	Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<std::shared_ptr<TextureClass>> textures);
 	~Mesh();
 
 	void Initialise(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices);
@@ -36,7 +37,7 @@ private:
 private:
     std::vector<VertexType> m_vertices;
     std::vector<UINT> m_indices;
-    std::vector<TextureClass>  m_textures;
+	std::vector<std::shared_ptr<TextureClass>>  m_textures;
 
 	ID3D11Buffer* m_vertexBuffer = nullptr;
 	ID3D11Buffer* m_indexBuffer = nullptr;

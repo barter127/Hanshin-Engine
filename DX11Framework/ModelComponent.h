@@ -55,7 +55,7 @@ private:
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
-	std::vector<TextureClass> LoadMaterialTextures(aiMaterial* mat, aiTextureType type);
+	void LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<TextureClass>>& textures);
 
 	std::vector<Mesh> m_meshes;
 

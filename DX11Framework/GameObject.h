@@ -19,7 +19,7 @@ public:
 	GameObject(ID3D11Device* device, HWND windowHandle);
 	~GameObject();
 
-	bool LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath, char* texturePath);
+	bool LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath);
 	std::string GetModelPath();
 	std::string GetTexturePath();
 

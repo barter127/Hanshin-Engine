@@ -6,7 +6,7 @@ using namespace DirectX;
 
 Mesh::Mesh() {}
 
-Mesh::Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<TextureClass> textures) :
+Mesh::Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<std::shared_ptr<TextureClass>> textures) :
 	m_vertices(vertices),
 	m_indices(indices),
 	m_textures(textures)
@@ -49,12 +49,10 @@ void Mesh::Draw(ID3D11DeviceContext* deviceCon)
 
 	deviceCon->PSSetSamplers(0, 1, &m_bilinearSamplerState); // Maybe I could have a UI element to change samplers.
 
-	if (m_textures.size() > 0)
+	for (int i = 0; i < m_textures.size(); i++)
 	{
-		deviceCon->PSSetShaderResources(0, 1, &m_textures[0].m_textureView);
-		deviceCon->PSSetShaderResources(1, 1, &m_textures[1].m_textureView);
-		deviceCon->PSSetShaderResources(2, 1, &m_textures[2].m_textureView);
-		deviceCon->PSSetShaderResources(3, 1, &m_textures[3].m_textureView);
+		if (m_textures[i].get())
+			deviceCon->PSSetShaderResources(i, 1, &m_textures[i].get()->m_textureView);
 	}
 
 	deviceCon->DrawIndexed(m_indices.size(), 0, 0);

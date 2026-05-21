@@ -182,7 +182,7 @@ void ApplicationLayer::UIMessage(HWND windowHandle, UINT umessage, WPARAM wparam
 void ApplicationLayer::CreateNewObject(char* modelPath, char* texturePath)
 {
     m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
-    bool result = m_objVector.back()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), modelPath, texturePath);
+    bool result = m_objVector.back()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), modelPath);
 }
 
 bool ApplicationLayer::LoadScene(string path)
@@ -221,7 +221,7 @@ bool ApplicationLayer::LoadScene(string path)
 		std::string objName = objectDesc["Name"];
 
 		m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
-		m_objVector.back().get()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)modelPath.c_str(), (char*)"stone01.tga");
+		m_objVector.back().get()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)modelPath.c_str());
 		m_objVector[i]->m_name = objName;
 
 		TransformComponent* transform = m_objVector.back()->m_transform;

@@ -98,7 +98,7 @@ Mesh ModelComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
 	vector<VertexType> vertices;
 	vector<UINT> indices;
-	vector<TextureClass> textures;
+	vector<std::shared_ptr<TextureClass>> textures;
 
 	// Walk through each of the mesh's vertices.
 	for (UINT i = 0; i < mesh->mNumVertices; i++) 
@@ -138,68 +138,20 @@ Mesh ModelComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	if (mesh->mMaterialIndex >= 0) 
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		textures.reserve(textures.size() + material->GetTextureCount());
 
-
-		std::vector<TextureClass> textureList = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
-		for (TextureClass texture : textureList)
+		constexpr aiTextureType textureTypes[] =
 		{
-			textures.push_back(texture);
-		}
-		textureList = LoadMaterialTextures(material, aiTextureType_HEIGHT);
-		for (TextureClass texture : textureList)
+			aiTextureType_DIFFUSE,
+			aiTextureType_HEIGHT,
+			aiTextureType_SHININESS,
+			aiTextureType_AMBIENT
+		};
+
+		for (aiTextureType type : textureTypes)
 		{
-			textures.push_back(texture);
+			LoadMaterialTextures(material, type, textures);
 		}
-		textureList = LoadMaterialTextures(material, aiTextureType_SHININESS);
-		for (TextureClass texture : textureList)
-		{
-			textures.push_back(texture);
-		}
-		textureList = LoadMaterialTextures(material, aiTextureType_AMBIENT);
-		for (TextureClass texture : textureList)
-		{
-			textures.push_back(texture);
-		}
-
-
-		//textureList = LoadMaterialTextures(material, aiTextureType_HEIGHT);
-		//for (auto texture : textureList)
-		//{
-		//	std::weak_ptr foundModel = Texture_Flyweight::FindTexture(texture, m_device, m_deviceCon);
-		//	std::shared_ptr<TextureClass> foundModelShared = foundModel.lock();
-
-		//	if (foundModelShared)
-		//	{
-		//		textures.push_back(*foundModelShared.get());
-		//	}
-
-		//}
-
-		//textureList = LoadMaterialTextures(material, aiTextureType_SHININESS);
-		//for (auto texture : textureList)
-		//{
-		//	std::weak_ptr foundModel = Texture_Flyweight::FindTexture(texture, m_device, m_deviceCon);
-		//	std::shared_ptr<TextureClass> foundModelShared = foundModel.lock();
-
-		//	if (foundModelShared)
-		//	{
-		//		textures.push_back(foundModelShared.get());
-		//	}
-
-		//}
-
-		//textureList = LoadMaterialTextures(material, aiTextureType_AMBIENT);
-		//for (auto texture : textureList)
-		//{
-		//	std::weak_ptr foundModel = Texture_Flyweight::FindTexture(texture, m_device, m_deviceCon);
-		//	std::shared_ptr<TextureClass> foundModelShared = foundModel.lock();
-
-		//	if (foundModelShared)
-		//	{
-		//		textures.push_back(foundModelShared.get());
-		//	}
-
-		//}
 	}
 
 	return Mesh(m_device, vertices, indices, textures);
@@ -225,24 +177,20 @@ bool ModelComponent::LoadModel(char* filename)
 	return true;
 }
 
-std::vector<TextureClass> ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type)
+void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<TextureClass>>& textures)
 {
-	std::vector<TextureClass> textures;
-	bool result;
+	const int textureCount = mat->GetTextureCount(type);
 
 	aiString pathStr;
-	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+
+	for (unsigned int i = 0; i < textureCount; ++i)
 	{
 		mat->GetTexture(type, i, &pathStr);
 
 		weak_ptr<TextureClass> weakTexturePtr = Texture_Flyweight::FindTexture(pathStr.C_Str(), m_device, m_deviceCon);
-		shared_ptr<TextureClass> sharedTexturePtr = weakTexturePtr.lock();
-
-		if (sharedTexturePtr)
+		if (auto sharedTexturePtr = weakTexturePtr.lock())
 		{
-			textures.push_back(*sharedTexturePtr.get());
+			textures.emplace_back(std::move(sharedTexturePtr));
 		}
-
 	}
-	return textures;
 }

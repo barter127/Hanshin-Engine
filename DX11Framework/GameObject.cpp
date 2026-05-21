@@ -20,7 +20,7 @@ GameObject::~GameObject()
 	if (m_transform) delete m_transform;
 }
 
-bool GameObject::LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath, char* texturePath)
+bool GameObject::LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath)
 {
 	bool result;
 	if (m_model) delete m_model;
@@ -33,8 +33,6 @@ bool GameObject::LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon,
 	}
 
 	m_modelPath = modelPath;
-	m_texturePath = texturePath;
-
 	return true;
 }
 
