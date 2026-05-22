@@ -28,6 +28,7 @@ public:
 
 	inline bool IsChild() { return m_parent != nullptr; }
 
+	std::list<std::shared_ptr<GameObject>> m_children; // Doesn't need to be contiguous.
 public:
 	TransformComponent* m_transform = nullptr;
 	std::string m_name = "Default Object";
@@ -42,7 +43,6 @@ private:
 
 private:
 	GameObject* m_parent = nullptr;
-	std::list<std::shared_ptr<GameObject>> m_children; // Doesn't need to be contiguous.
 
 	ModelComponent* m_model = nullptr;
 

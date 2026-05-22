@@ -98,12 +98,9 @@ void ImGuiWrapper::DockSpace()
 
 		// Split the dockspace into 3 parts.
 		ImGuiID dockMainId = dockspaceID;
-
 		ImGuiID dockLeftID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Left, 0.5f, nullptr, &dockMainId);
 		ImGui::DockBuilderSetNodeSize(dockLeftID, ImVec2{300, 600});
-
 		ImGuiID dockIDNewObj = ImGui::DockBuilderSplitNode(dockLeftID, ImGuiDir_Down, 0.3f, nullptr, &dockLeftID);
-
 		ImGuiID dockRightID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Right, 0.2, nullptr, &dockMainId);
 		ImGui::DockBuilderSetNodeSize(dockRightID, ImVec2{200, 600});
 

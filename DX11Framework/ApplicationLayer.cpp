@@ -64,6 +64,10 @@ bool ApplicationLayer::Initialise(ID3D11Device* device, ID3D11DeviceContext* dev
         { 0.0f, 1.0f, -1.0f });
     m_dirLight->Initialise(device);
 
+	m_objVector[0].get()->AddChild(m_objVector[1].get());
+	m_objVector[1].get()->AddChild(m_objVector[2].get());
+	m_objVector[0].get()->AddChild(m_objVector[3].get());
+
     return true;
 }
 
@@ -76,7 +80,7 @@ void ApplicationLayer::Update(float deltaTime)
     switch (m_ui->NewObjectPanel())
     {
     case m_ui->Primitives::Cube:
-        CreateNewObject((char*)"Models/Chiyo/chiyo.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Cube.obj", (char*)"stone01.tga");
         break;
 
     case m_ui->Primitives::Plane:
@@ -111,7 +115,7 @@ void ApplicationLayer::Update(float deltaTime)
         m_pointLight->GetSpecularColour(), m_pointLight->GetSpecularPower(),
         m_pointLight->GetLightPos());
 
-    m_ui->GaussDataPanel();
+	m_ui->SceneGraph(m_objVector);
 
     if (Input::GetKeyDown('1'))
     {

@@ -9,7 +9,10 @@
 #include <d3d11_4.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
+
 #include <string>
+#include <vector>
+#include <memory>
 
 #include "RenderTextureClass.h"
 #include "Blurring.h"
@@ -36,6 +39,7 @@ public:
 		float* specularCol, float* specularPower,
 		DirectX::XMFLOAT4& lightDir);
 	void GaussDataPanel();
+	void SceneGraph(std::vector<std::shared_ptr<GameObject>>& objVector);
 
 	bool SaveChanges();
 

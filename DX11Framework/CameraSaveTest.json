@@ -27,7 +27,7 @@
   "GameObjects": [
     {
       "ModelPath": "Models/Iggy/model.obj",
-      "Name": "Default Object",
+      "Name": "Iggy",
       "Position": {
         "X": 0.0,
         "Y": -7.400000095367432,
@@ -46,7 +46,7 @@
     },
     {
       "ModelPath": "Primitives/Prim_Cube.obj",
-      "Name": "Default Object",
+      "Name": "Cube",
       "Position": {
         "X": 2.0,
         "Y": 1.0,
@@ -65,7 +65,7 @@
     },
     {
       "ModelPath": "Primitives/Prim_Torus.obj",
-      "Name": "Default Object",
+      "Name": "Torus",
       "Position": {
         "X": 2.0,
         "Y": 1.0,
@@ -84,7 +84,7 @@
     },
     {
       "ModelPath": "Models/Chiyo/chiyo.obj",
-      "Name": "Default Object",
+      "Name": "Cheeto",
       "Position": {
         "X": -5.0,
         "Y": -8.600000381469727,

@@ -37,10 +37,10 @@ private:
 	ModelComponent* m_model;
 
 	int m_selectedObj = 0;
-	std::vector<std::shared_ptr<GameObject>>m_objVector;
+	std::vector<std::shared_ptr<GameObject>> m_objVector;
 
 	int m_activeCamera = 2;
-	std::vector<std::shared_ptr<BaseCamera>>m_camVector;
+	std::vector<std::shared_ptr<BaseCamera>> m_camVector;
 
 	SkyBox* m_skybox = nullptr;
 	PointLight* m_pointLight = nullptr;
