@@ -39,6 +39,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
 	style.FontScaleDpi = main_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+	style.TreeLinesFlags = ImGuiTreeNodeFlags_DrawLinesToNodes;
 
 	m_viewportTexture = new RenderTextureClass();
 	m_viewportTexture->Initialise(device, 1280, 768, 0.3f, 1000.0f, 1);
@@ -304,16 +305,26 @@ void ImGuiWrapper::LightPanel(float* ambientCol, float* diffuseCol,
 
 bool CreateSceneNode(GameObject* object)
 {
-	constexpr ImGuiTreeNodeFlags parentFlag = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
-	constexpr ImGuiTreeNodeFlags childFlag = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf;
+	ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_FramePadding;
+
+	if (object->m_children.empty())
+		flag |= ImGuiTreeNodeFlags_Leaf;
+	else
+		flag |= ImGuiTreeNodeFlags_OpenOnArrow;
 
 	list<shared_ptr<GameObject>>::iterator iter;
-	if (ImGui::TreeNodeEx(object->m_name.c_str(), parentFlag))
+	if (ImGui::TreeNodeEx(object->m_name.c_str(), flag))
 	{
+		if (ImGui::IsItemClicked())
+		{
+			CreateSceneNode(object);
+		}
+
 		for (iter = object->m_children.begin(); iter != object->m_children.end(); iter++)
 		{
 			CreateSceneNode(iter->get());
 		}
+
 
 		ImGui::TreePop();
 		return true;
@@ -328,7 +339,8 @@ void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 
 	constexpr ImGuiTreeNodeFlags rootFlag = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
 
-	if (ImGui::TreeNodeEx("root", rootFlag))
+	
+	if (ImGui::TreeNodeEx("Level Name", rootFlag))
 	{
 		CreateSceneNode(objVector[0].get());
 
