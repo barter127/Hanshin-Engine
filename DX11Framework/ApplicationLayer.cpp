@@ -76,7 +76,7 @@ void ApplicationLayer::Update(float deltaTime)
     switch (m_ui->NewObjectPanel())
     {
     case m_ui->Primitives::Cube:
-        CreateNewObject((char*)"Primitives/Prim_Cube.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Models/Chiyo/chiyo.obj", (char*)"stone01.tga");
         break;
 
     case m_ui->Primitives::Plane:

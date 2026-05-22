@@ -138,7 +138,7 @@ Mesh ModelComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	if (mesh->mMaterialIndex >= 0) 
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		textures.reserve(textures.size() + material->GetTextureCount());
+
 
 		constexpr aiTextureType textureTypes[] =
 		{
@@ -179,7 +179,9 @@ bool ModelComponent::LoadModel(char* filename)
 
 void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<TextureClass>>& textures)
 {
-	const int textureCount = mat->GetTextureCount(type);
+	const unsigned int textureCount = mat->GetTextureCount(type);
+
+	textures.reserve(textures.size() + textureCount);
 
 	aiString pathStr;
 
