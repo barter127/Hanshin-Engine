@@ -28,7 +28,6 @@ public:
 
 	inline bool IsChild() { return m_parent != nullptr; }
 
-	std::list<std::shared_ptr<GameObject>> m_children; // Doesn't need to be contiguous.
 public:
 	TransformComponent* m_transform = nullptr;
 	std::string m_name = "Default Object";
@@ -37,6 +36,9 @@ public:
 	std::string m_texturePath = "";
 
 	void AddChild(GameObject* goPtr);
+
+	bool m_isSelected = false;
+	std::list<std::shared_ptr<GameObject>> m_children; // Doesn't need to be contiguous.
 
 private:
 	void TransformSelfAndChildren();

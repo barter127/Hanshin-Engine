@@ -49,8 +49,6 @@ public:
 	void GaussianBlur(ID3D11DeviceContext* devCon);
 	void BlurredViewportUpdate(ID3D11DeviceContext* deviceCon);
 
-	void WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
-
 	void DockSpace();
 
 

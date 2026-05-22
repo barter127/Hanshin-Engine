@@ -10,6 +10,9 @@ using namespace DirectX;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam)) return true;
+
     PAINTSTRUCT ps;
     HDC hdc;
 
@@ -342,11 +345,6 @@ void DX11Framework::Draw()
     ResetViewport();
 
     _swapChain->Present(0, 0);
-}
-
-void DX11Framework::UIMessage(UINT umessage, WPARAM wparam, LPARAM lparam)
-{
-    m_Application->UIMessage(_windowHandle, umessage, wparam, lparam);
 }
 
 void DX11Framework::SetBackBufferRenderTarget()

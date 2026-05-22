@@ -30,7 +30,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		{
 			application.Update();
 			application.Draw();
-			application.UIMessage(msg.message, msg.wParam, msg.lParam);
 		}
 	}
 

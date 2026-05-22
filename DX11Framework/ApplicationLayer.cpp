@@ -178,11 +178,6 @@ void ApplicationLayer::Draw(MatrixBuffer& mb, DX11Framework* dx)
     m_ui->Render();
 }
 
-void ApplicationLayer::UIMessage(HWND windowHandle, UINT umessage, WPARAM wparam, LPARAM lparam)
-{
-    m_ui->WndProc(windowHandle, umessage, wparam, lparam);
-}
-
 void ApplicationLayer::CreateNewObject(char* modelPath, char* texturePath)
 {
     m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));

@@ -25,8 +25,6 @@ public:
 	void Update(float deltaTime);
 	void Draw(MatrixBuffer& mb, DX11Framework* dx);
 
-	void UIMessage(HWND windowHandle, UINT umessage, WPARAM wparam, LPARAM lparam);
-
 private:
 	void CreateNewObject(char* modelPath, char* texturePath);
 	bool LoadScene(std::string path);

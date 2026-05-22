@@ -15,7 +15,12 @@ bool ImGuiWrapper::m_initalised = false;
 
 ImGuiWrapper::ImGuiWrapper() {}
 
-ImGuiWrapper::~ImGuiWrapper(){}
+ImGuiWrapper::~ImGuiWrapper()
+{
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
 
 void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceContext* deviceCon)
 {
@@ -24,6 +29,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	ImGui_ImplWin32_EnableDpiAwareness();
 	float main_scale = ImGui_ImplWin32_GetDpiScaleForHwnd(hwnd);
 
+	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -135,6 +141,8 @@ void ImGuiWrapper::Render()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	ImGui::UpdatePlatformWindows();
+	ImGui::RenderPlatformWindowsDefault();
+
 	ImGui::EndFrame();
 }
 
@@ -229,15 +237,6 @@ void ImGuiWrapper::GaussDataPanel()
 
 #pragma endregion
 
-void ImGuiWrapper::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
-{
-	if (m_initalised)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImGui_ImplWin32_WndProcHandler(hwnd, umessage, wparam, lparam);
-	}
-}
-
 int ImGuiWrapper::NewObjectPanel()
 {
 	int returnItem = -1;
@@ -305,7 +304,7 @@ void ImGuiWrapper::LightPanel(float* ambientCol, float* diffuseCol,
 
 bool CreateSceneNode(GameObject* object)
 {
-	ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_FramePadding;
+	ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_DefaultOpen;
 
 	if (object->m_children.empty())
 		flag |= ImGuiTreeNodeFlags_Leaf;
@@ -313,11 +312,25 @@ bool CreateSceneNode(GameObject* object)
 		flag |= ImGuiTreeNodeFlags_OpenOnArrow;
 
 	list<shared_ptr<GameObject>>::iterator iter;
-	if (ImGui::TreeNodeEx(object->m_name.c_str(), flag))
+	std::string nodeText;
+
+	if (!object->m_isSelected)
+		nodeText = object->m_name;
+
+	else
+		nodeText = "##Selected";
+
+	if (ImGui::TreeNodeEx((char*)nodeText.c_str(), flag))
 	{
-		if (ImGui::IsItemClicked())
+		if (object->m_isSelected)
 		{
-			CreateSceneNode(object);
+			ImGui::SameLine();
+			ImGui::InputText("##Edit Name", (char*)object->m_name.c_str(), 256);
+		}
+
+		if (ImGui::IsItemClicked() && ImGui::IsMouseDoubleClicked(0))
+		{
+			object->m_isSelected = true;
 		}
 
 		for (iter = object->m_children.begin(); iter != object->m_children.end(); iter++)
@@ -339,7 +352,6 @@ void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 
 	constexpr ImGuiTreeNodeFlags rootFlag = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
 
-	
 	if (ImGui::TreeNodeEx("Level Name", rootFlag))
 	{
 		CreateSceneNode(objVector[0].get());

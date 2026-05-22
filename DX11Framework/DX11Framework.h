@@ -32,8 +32,6 @@ public:
 	void Update();
 	void Draw();
 
-	void UIMessage(UINT umessage, WPARAM wparam, LPARAM lparam);
-
 	void SetBackBufferRenderTarget();
 	void ResetViewport();
 
