@@ -42,6 +42,9 @@ public:
 
 	void SceneGraph(std::vector<std::shared_ptr<GameObject>>& objVector);
 	bool CreateSceneNode(GameObject* object);
+	void AcceptLoad(GameObject* object);
+	void AcceptLoadRoot();
+
 
 	bool SaveChanges();
 

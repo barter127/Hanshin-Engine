@@ -4,6 +4,7 @@
 #include "ModelComponent.h"
 
 using namespace DirectX;
+using namespace std;
 
 int GameObject::m_nextID = -1;
 
@@ -74,6 +75,22 @@ void GameObject::AddChild(GameObject* goPtr)
 {
 	m_children.emplace_back(goPtr);
 	m_children.back()->m_parent = this; // Set childs parent.
+}
+
+void GameObject::RemoveChild(GameObject* goPtr)
+{
+	if (m_children.empty()) return;
+
+	list<GameObject*>::iterator iter;
+	for (iter = m_children.begin(); iter != m_children.end(); iter++)
+	{
+		GameObject* iterObj = *iter;
+		if (iterObj->m_name == goPtr->m_name)
+		{
+			m_children.erase(iter);
+			return;
+		}
+	}
 }
 
 void GameObject::TransformSelfAndChildren()

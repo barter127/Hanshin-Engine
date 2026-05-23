@@ -117,10 +117,11 @@ void ApplicationLayer::Update(float deltaTime)
 
     m_ui->TransformPanel(*m_objVector[m_ui->GetSelectedIndex()]);
 
-    m_ui->LightPanel(m_pointLight->GetAmbientColour(),
-        m_pointLight->GetDiffuseColour(),
-        m_pointLight->GetSpecularColour(), m_pointLight->GetSpecularPower(),
-        m_pointLight->GetLightPos());
+
+    //m_ui->LightPanel(m_pointLight->GetAmbientColour(),
+    //    m_pointLight->GetDiffuseColour(),
+    //    m_pointLight->GetSpecularColour(), m_pointLight->GetSpecularPower(),
+    //    m_pointLight->GetLightPos());
 
 	m_ui->SceneGraph(m_objVector);
 

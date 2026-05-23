@@ -34,9 +34,10 @@ public:
 	std::string m_modelPath = "";
 
 	void AddChild(GameObject* goPtr);
+	void RemoveChild(GameObject* goPtr);
 
 	bool m_isSelected = false;
-	std::list<std::shared_ptr<GameObject>> m_children; // Doesn't need to be contiguous.
+	std::list<GameObject*> m_children; // Doesn't need to be contiguous.
 
 	static int m_nextID;
 	int m_id = 0;

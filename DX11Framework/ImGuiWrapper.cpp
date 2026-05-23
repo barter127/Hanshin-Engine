@@ -196,55 +196,6 @@ void ImGuiWrapper::ViewportUpdate(ID3D11DeviceContext* deviceCon)
 	ImGui::End();
 }
 
-#pragma region Blurring
-
-void ImGuiWrapper::BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon)
-{
-	m_blurring->CopyViewport(device, deviceCon, m_viewportTexture->GetShaderResourceView());
-}
-
-void ImGuiWrapper::GaussianBlur(ID3D11DeviceContext* devCon)
-{
-	m_blurring->Gaussian(devCon);
-}
-
-void ImGuiWrapper::BlurredViewportUpdate(ID3D11DeviceContext* deviceCon)
-{
-	ImGui::Begin("Blurred Viewport");
-
-	// Display Viewport.
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	ImVec2 size = { viewportPanelSize.x, viewportPanelSize.y };
-
-	ImGui::Image((ImTextureID)(intptr_t)m_blurring->GetShaderResourceView(), ImVec2{ size.x, size.y }, ImVec2{ 0, 0 }, ImVec2{ 1, 1 });
-
-	ImGui::End();
-}
-
-void ImGuiWrapper::GaussDataPanel()
-{
-	constexpr int intSliderSpeed = 1;
-	constexpr int minKernel = 1;
-	constexpr int maxKernel = 10;
-
-	constexpr float floatSliderSpeed = 0.1f;
-	constexpr float minSamplePos = 0.0f;
-	constexpr float maxSamplePos = 100.0f;
-
-	constexpr float minSigma = 0.1f;
-	constexpr float maxSigma = 10.0f; // Literally me.
-
-	ImGui::Begin("Edit Gaussian Data");
-
-	ImGui::DragInt("Kernel Size", &m_blurring->m_gaussData.KernelSize, intSliderSpeed, minKernel, maxKernel);
-	ImGui::DragFloat("Sample Pos Multiplier", &m_blurring->m_gaussData.SamplePosMultiplier, floatSliderSpeed, minSamplePos, maxSamplePos);
-	ImGui::DragFloat("Sigma", &m_blurring->m_gaussData.Sigma, floatSliderSpeed, minSigma, maxSigma);
-
-
-	ImGui::End();
-}
-
-#pragma endregion
 
 int ImGuiWrapper::NewObjectPanel()
 {
@@ -311,6 +262,60 @@ void ImGuiWrapper::LightPanel(float* ambientCol, float* diffuseCol,
 }
 
 
+void ImGuiWrapper::AcceptLoad(GameObject* object)
+{
+	if (ImGui::BeginDragDropSource())
+	{
+		ImGui::SetDragDropPayload("Scene Graph Node", &object, sizeof(nullptr));
+		ImGui::Text((char*)object->m_name.c_str());
+		ImGui::EndDragDropSource();
+	}
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene Graph Node");
+
+		if (payload)
+		{
+			// I pass a ptr to a gameobject ptr this accepts it.
+			GameObject* dragged = *(GameObject**)payload->Data;
+
+			if (dragged->m_parent)
+			{
+				dragged->m_parent->RemoveChild(dragged);
+			}
+
+			object->AddChild(dragged);
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+}
+
+void ImGuiWrapper::AcceptLoadRoot()
+{
+	if (ImGui::BeginDragDropTarget())
+	{
+		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene Graph Node");
+
+
+		if (payload)
+		{
+			// I pass a ptr to a gameobject ptr this accepts it.
+			GameObject* dragged = *(GameObject**)payload->Data;
+
+			if (dragged->m_parent)
+			{
+				dragged->m_parent->RemoveChild(dragged);
+			}
+
+			dragged->m_parent = nullptr;
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+}
+
 bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 {
 	ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_DefaultOpen;
@@ -322,18 +327,13 @@ bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 
 	if (ImGui::TreeNodeEx((char*)object->m_name.c_str(), flag))
 	{
-
-		// Selection.
-		if (ImGui::IsItemClicked())
-		{
-			m_selectedItem = object->m_id;
-		}
+		AcceptLoad(object);
 
 		// Display children.
-		list<shared_ptr<GameObject>>::iterator iter;
+		list<GameObject*>::iterator iter;
 		for (iter = object->m_children.begin(); iter != object->m_children.end(); iter++)
 		{
-			CreateSceneNode(iter->get());
+			CreateSceneNode(*iter);
 		}
 
 
@@ -352,6 +352,8 @@ void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 
 	if (ImGui::TreeNodeEx("Level Name", rootFlag))
 	{
+		AcceptLoadRoot();
+
 		// Create scene nodes for parents. Child nodes are handled inside CreateSceneNode().
 		for (shared_ptr<GameObject> objSPtr : objVector)
 		{
@@ -360,6 +362,7 @@ void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 			if (objPtr && objPtr->m_parent == nullptr)
 				CreateSceneNode(objPtr);
 		}
+
 
 		ImGui::TreePop();
 	}
@@ -453,3 +456,53 @@ void ImGuiWrapper::DrawVec3Control(XMFLOAT3& vector, std::string displayString, 
 	ImGui::PopStyleVar();
 	ImGui::EndTable();
 }
+
+#pragma region Blurring
+
+void ImGuiWrapper::BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon)
+{
+	m_blurring->CopyViewport(device, deviceCon, m_viewportTexture->GetShaderResourceView());
+}
+
+void ImGuiWrapper::GaussianBlur(ID3D11DeviceContext* devCon)
+{
+	m_blurring->Gaussian(devCon);
+}
+
+void ImGuiWrapper::BlurredViewportUpdate(ID3D11DeviceContext* deviceCon)
+{
+	ImGui::Begin("Blurred Viewport");
+
+	// Display Viewport.
+	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	ImVec2 size = { viewportPanelSize.x, viewportPanelSize.y };
+
+	ImGui::Image((ImTextureID)(intptr_t)m_blurring->GetShaderResourceView(), ImVec2{ size.x, size.y }, ImVec2{ 0, 0 }, ImVec2{ 1, 1 });
+
+	ImGui::End();
+}
+
+void ImGuiWrapper::GaussDataPanel()
+{
+	constexpr int intSliderSpeed = 1;
+	constexpr int minKernel = 1;
+	constexpr int maxKernel = 10;
+
+	constexpr float floatSliderSpeed = 0.1f;
+	constexpr float minSamplePos = 0.0f;
+	constexpr float maxSamplePos = 100.0f;
+
+	constexpr float minSigma = 0.1f;
+	constexpr float maxSigma = 10.0f; // Literally me.
+
+	ImGui::Begin("Edit Gaussian Data");
+
+	ImGui::DragInt("Kernel Size", &m_blurring->m_gaussData.KernelSize, intSliderSpeed, minKernel, maxKernel);
+	ImGui::DragFloat("Sample Pos Multiplier", &m_blurring->m_gaussData.SamplePosMultiplier, floatSliderSpeed, minSamplePos, maxSamplePos);
+	ImGui::DragFloat("Sigma", &m_blurring->m_gaussData.Sigma, floatSliderSpeed, minSigma, maxSigma);
+
+
+	ImGui::End();
+}
+
+#pragma endregion
