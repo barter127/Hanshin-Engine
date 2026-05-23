@@ -5,11 +5,19 @@
 
 using namespace DirectX;
 
+int GameObject::m_nextID = -1;
+
 GameObject::GameObject(ID3D11Device* device, HWND windowHandle)
 {
 	m_transform = new TransformComponent({ 0.0f, 0.0f, 0.0f },
 		{ 0.0f,0.0f,0.0f },
 		{ 1.0f,1.0f,1.0f });
+
+	if (m_nextID != -1)
+	{
+		m_id = m_nextID;
+		m_nextID++;
+	}
 
 	m_initialised = true;
 }
@@ -39,11 +47,6 @@ bool GameObject::LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon,
 std::string GameObject::GetModelPath()
 {
 	return m_modelPath;
-}
-
-std::string GameObject::GetTexturePath()
-{
-	return m_texturePath;
 }
 
 void GameObject::Update(float deltaTime)

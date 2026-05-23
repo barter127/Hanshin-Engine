@@ -39,7 +39,9 @@ public:
 		float* specularCol, float* specularPower,
 		DirectX::XMFLOAT4& lightDir);
 	void GaussDataPanel();
+
 	void SceneGraph(std::vector<std::shared_ptr<GameObject>>& objVector);
+	bool CreateSceneNode(GameObject* object);
 
 	bool SaveChanges();
 
@@ -51,6 +53,8 @@ public:
 
 	void DockSpace();
 
+	// For simplicity just allowing 1 object to be selected at a time.
+	int GetSelectedIndex() { return m_selectedItem; }
 
 public:
 	enum Primitives

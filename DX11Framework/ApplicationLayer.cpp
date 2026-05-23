@@ -68,6 +68,13 @@ bool ApplicationLayer::Initialise(ID3D11Device* device, ID3D11DeviceContext* dev
 	m_objVector[1].get()->AddChild(m_objVector[2].get());
 	m_objVector[0].get()->AddChild(m_objVector[3].get());
 
+	// Idk how I feel about this way of setting ids. Maybe we could save it 
+	for (int i = 0; i < m_objVector.size(); i++)
+	{
+		m_objVector[i].get()->m_id = i;
+	}
+	GameObject::m_nextID = m_objVector.size();
+
     return true;
 }
 
@@ -108,7 +115,7 @@ void ApplicationLayer::Update(float deltaTime)
         break;
     }
 
-    m_ui->TransformPanel(*m_objVector[m_selectedObj]);
+    m_ui->TransformPanel(*m_objVector[m_ui->GetSelectedIndex()]);
 
     m_ui->LightPanel(m_pointLight->GetAmbientColour(),
         m_pointLight->GetDiffuseColour(),
@@ -126,18 +133,6 @@ void ApplicationLayer::Update(float deltaTime)
         if (m_activeCamera >= m_camVector.size())
         {
             m_activeCamera = 0;
-        }
-    }
-
-    if (Input::GetKeyDown('2'))
-    {
-        // Increment current cam.
-        m_selectedObj++;
-
-        // Wrap around vector.
-        if (m_selectedObj >= m_objVector.size())
-        {
-            m_selectedObj = 0;
         }
     }
 

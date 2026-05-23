@@ -311,7 +311,7 @@ void ImGuiWrapper::LightPanel(float* ambientCol, float* diffuseCol,
 }
 
 
-bool CreateSceneNode(GameObject* object)
+bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 {
 	ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_DefaultOpen;
 
@@ -324,13 +324,9 @@ bool CreateSceneNode(GameObject* object)
 	{
 
 		// Selection.
-		if (ImGui::IsItemClicked() && ImGui::IsMouseDoubleClicked(0))
+		if (ImGui::IsItemClicked())
 		{
-			object->m_isSelected = true;
-		}
-		else if (!ImGui::IsItemClicked() && ImGui::IsMouseClicked(0))
-		{
-			object->m_isSelected = false;
+			m_selectedItem = object->m_id;
 		}
 
 		// Display children.

@@ -21,7 +21,6 @@ public:
 
 	bool LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath);
 	std::string GetModelPath();
-	std::string GetTexturePath();
 
 	void Update(float deltaTime);
 	void Render(ID3D11DeviceContext* deviceCon, MatrixBuffer& mb);
@@ -33,13 +32,14 @@ public:
 	std::string m_name = "Default Object";
 
 	std::string m_modelPath = "";
-	std::string m_texturePath = "";
 
 	void AddChild(GameObject* goPtr);
 
 	bool m_isSelected = false;
 	std::list<std::shared_ptr<GameObject>> m_children; // Doesn't need to be contiguous.
 
+	static int m_nextID;
+	int m_id = 0;
 private:
 	void TransformSelfAndChildren();
 
@@ -47,6 +47,7 @@ private:
 	GameObject* m_parent = nullptr;
 
 	ModelComponent* m_model = nullptr;
+
 
 	bool m_initialised = false;
 
