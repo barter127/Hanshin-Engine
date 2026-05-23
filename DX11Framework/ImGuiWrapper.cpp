@@ -150,6 +150,15 @@ void ImGuiWrapper::TransformPanel(GameObject& obj)
 {
 	ImGui::Begin("Transform");
 
+	constexpr int maxNameSize = 256;
+	ImGui::Text("Name");
+	ImGui::SameLine();
+	ImGui::InputText("##TransformName", (char*)obj.m_name.c_str(), maxNameSize);
+	ImGui::NewLine();
+
+
+
+
 	int index = 0;
 	constexpr int resetToZero = 0;
 	constexpr int resetToOne = 1;
@@ -311,28 +320,21 @@ bool CreateSceneNode(GameObject* object)
 	else
 		flag |= ImGuiTreeNodeFlags_OpenOnArrow;
 
-	list<shared_ptr<GameObject>>::iterator iter;
-	std::string nodeText;
-
-	if (!object->m_isSelected)
-		nodeText = object->m_name;
-
-	else
-		nodeText = "##Selected";
-
-	if (ImGui::TreeNodeEx((char*)nodeText.c_str(), flag))
+	if (ImGui::TreeNodeEx((char*)object->m_name.c_str(), flag))
 	{
-		if (object->m_isSelected)
-		{
-			ImGui::SameLine();
-			ImGui::InputText("##Edit Name", (char*)object->m_name.c_str(), 256);
-		}
 
+		// Selection.
 		if (ImGui::IsItemClicked() && ImGui::IsMouseDoubleClicked(0))
 		{
 			object->m_isSelected = true;
 		}
+		else if (!ImGui::IsItemClicked() && ImGui::IsMouseClicked(0))
+		{
+			object->m_isSelected = false;
+		}
 
+		// Display children.
+		list<shared_ptr<GameObject>>::iterator iter;
 		for (iter = object->m_children.begin(); iter != object->m_children.end(); iter++)
 		{
 			CreateSceneNode(iter->get());
@@ -354,15 +356,20 @@ void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 
 	if (ImGui::TreeNodeEx("Level Name", rootFlag))
 	{
-		CreateSceneNode(objVector[0].get());
+		// Create scene nodes for parents. Child nodes are handled inside CreateSceneNode().
+		for (shared_ptr<GameObject> objSPtr : objVector)
+		{
+			GameObject* objPtr = objSPtr.get();
 
+			if (objPtr && objPtr->m_parent == nullptr)
+				CreateSceneNode(objPtr);
+		}
 
 		ImGui::TreePop();
 	}
 
 	ImGui::End();
 }
-
 
 void ImGuiWrapper::DrawVec3Control(XMFLOAT3& vector, std::string displayString, int index,float resetTo, float columnWidth, float barWidth)
 {
