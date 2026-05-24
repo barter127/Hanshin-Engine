@@ -27,8 +27,6 @@ public:
 
 private:
 	void CreateNewObject(char* modelPath, char* texturePath);
-	bool LoadScene(std::string path);
-	bool SaveScene(std::string path);
 
 	ImGuiWrapper* m_ui;
 
@@ -37,7 +35,7 @@ private:
 	int m_selectedObj = 0;
 	std::vector<std::shared_ptr<GameObject>> m_objVector;
 
-	int m_activeCamera = 2;
+	int m_activeCamera = 0;
 	std::vector<std::shared_ptr<BaseCamera>> m_camVector;
 
 	SkyBox* m_skybox = nullptr;

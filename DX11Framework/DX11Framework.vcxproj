@@ -170,6 +170,7 @@
     <ClCompile Include="ModelComponent.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RenderTextureClass.cpp" />
+    <ClCompile Include="Saving.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="TextureClass.cpp" />
     <ClCompile Include="TextureFlyweight.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderTextureClass.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Saving.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TextureClass.h" />
