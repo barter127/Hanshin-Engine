@@ -211,11 +211,10 @@
     <ClInclude Include="DollyCamera.h" />
     <ClInclude Include="DX11Framework.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="HelperFunctions.h" />
     <ClInclude Include="ImGuiWrapper.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="BaseLight.h" />
-    <ClInclude Include="Macro.h" />
+    <ClInclude Include="HelperMacros.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelComponent.h" />
     <ClInclude Include="PointLight.h" />

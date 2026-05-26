@@ -51,9 +51,6 @@
     <Filter Include="Header Files\Lighting">
       <UniqueIdentifier>{93e9be4b-fae8-4cfb-af4d-f00fd1bb071d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Helper">
-      <UniqueIdentifier>{1da4e007-e1c5-4833-a1c9-1efc580d618d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX11Framework.cpp">
@@ -244,11 +241,8 @@
     <ClInclude Include="Saving.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Macro.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="HelperFunctions.h">
-      <Filter>Header Files\Helper</Filter>
+    <ClInclude Include="HelperMacros.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

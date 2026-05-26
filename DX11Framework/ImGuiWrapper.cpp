@@ -13,6 +13,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <stack>
 
 using namespace DirectX;
 using namespace std;
@@ -20,7 +21,7 @@ namespace fs = std::filesystem;
 
 bool ImGuiWrapper::m_initalised = false;
 
-static std::string currentDir = "Models/";
+static string currentDir = "Models/";
 
 ImGuiWrapper::ImGuiWrapper() {}
 
@@ -73,10 +74,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	m_folderTexture = new TextureClass;
 	m_folderTexture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Engine Assets/folder.png");
 
-	for (const auto& entry : fs::directory_iterator(currentDir))
-	{
-		Texture_Flyweight::FindTexture(entry.path().string(), device, deviceCon);
-	}
+	pathStack.push(currentDir);
 
 	m_initalised = true;
 }
@@ -372,13 +370,28 @@ bool ImGuiWrapper::DisplayFolder(fs::directory_entry entry, string displayName)
 	string buttonID = "##" + displayName;
 	if (ImGui::ImageButton(buttonID.c_str(), (ImTextureID)(intptr_t)m_folderTexture->GetTexture(), ImVec2(50, 50)))
 	{
-		currentDir = entry.path().string();
+		EnterFolder(entry);
 		return true;
 	}
 
 	ImGui::Text(displayName.c_str());
 
 	return false;
+}
+
+void ImGuiWrapper::EnterFolder(fs::directory_entry entry)
+{
+	currentDir = entry.path().string();
+	m_pathStack.push(entry.path().string());
+}
+
+void ImGuiWrapper::ExitCurrentFolder()
+{
+	if (m_pathStack.size() > 1)
+	{
+		pathStack.pop();
+		currentDir = pathStack.top();
+	}
 }
 
 void ImGuiWrapper::ContentBrowser()
@@ -395,18 +408,11 @@ void ImGuiWrapper::ContentBrowser()
 
 	if (ImGui::Button("<"))
 	{
+		ExitCurrentFolder();
 
 	}
 
-	ImGui::SameLine();
-
-	if (ImGui::Button(">"))
-	{
-
-	}
-
-	constexpr ImGuiTableFlags browserFlags = ImGuiTableFlags_SizingFixedSame
-		| ImGuiTableFlags_PadOuterX;
+	constexpr ImGuiTableFlags browserFlags = ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_PadOuterX;
 
 	constexpr int tableWidth = 4;
 	int tableLength = 11;
@@ -416,6 +422,8 @@ void ImGuiWrapper::ContentBrowser()
 	ImGui::TableNextRow();
 
 	int columnIndex = 0;
+
+
 	for (const auto& entry : fs::directory_iterator(currentDir))
 	{
 		ImGui::TableSetColumnIndex(columnIndex);
@@ -457,7 +465,7 @@ bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 	else
 		flag |= ImGuiTreeNodeFlags_OpenOnArrow;
 
-	if (ImGui::TreeNodeEx(StringToCharPtr(object->m_name), flag))
+	if (ImGui::TreeNodeEx(STRING_TO_CHARPTR(object->m_name), flag))
 	{
 		AcceptLoad(object);
 
