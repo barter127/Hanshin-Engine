@@ -19,6 +19,8 @@ namespace fs = std::filesystem;
 
 bool ImGuiWrapper::m_initalised = false;
 
+static std::string currentDir = "Models/";
+
 ImGuiWrapper::ImGuiWrapper() {}
 
 ImGuiWrapper::~ImGuiWrapper()
@@ -27,8 +29,6 @@ ImGuiWrapper::~ImGuiWrapper()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
-
-TextureClass* texture = new TextureClass;
 
 void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceContext* deviceCon)
 {
@@ -67,10 +67,10 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	m_DevConPtr = deviceCon;
 	m_WindowHandle = hwnd;
 
-	texture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Models/Iggy/iggy_BaseColor.png");
+	m_folderTexture = new TextureClass;
+	m_folderTexture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Engine Assets/folder.png");
 
-	std::string path = "Models/Iggy/";
-	for (const auto& entry : fs::directory_iterator(path))
+	for (const auto& entry : fs::directory_iterator(currentDir))
 	{
 		Texture_Flyweight::FindTexture(entry.path().string(), device, deviceCon);
 	}
@@ -354,6 +354,30 @@ string ImGuiWrapper::GetFileName(fs::directory_entry entry, string path)
 	return outputName;
 }
 
+void ImGuiWrapper::DisplayTexture(fs::directory_entry entry, string displayName)
+{
+	std::weak_ptr<TextureClass> iconTexture = Texture_Flyweight::FindTexture(entry.path().string(), m_DevicePtr.Get(), m_DevConPtr.Get());
+	if (iconTexture.expired()) return;
+
+	// Draw UI.
+	ImGui::Image((ImTextureID)(intptr_t)iconTexture.lock()->GetTexture(), ImVec2(50, 50));
+	ImGui::Text((char*)displayName.c_str());
+}
+
+bool ImGuiWrapper::DisplayFolder(fs::directory_entry entry, string displayName)
+{
+	string buttonID = "##" + displayName;
+	if (ImGui::ImageButton(buttonID.c_str(), (ImTextureID)(intptr_t)m_folderTexture->GetTexture(), ImVec2(50, 50)))
+	{
+		currentDir = entry.path().string();
+		return true;
+	}
+
+	ImGui::Text(displayName.c_str());
+
+	return false;
+}
+
 void ImGuiWrapper::ContentBrowser()
 {
 	ImGui::ShowDemoWindow();
@@ -362,6 +386,20 @@ void ImGuiWrapper::ContentBrowser()
 	if (!ImGui::Begin("Content", nullptr, winFlags))
 	{
 		ImGui::End();
+	}
+
+	ImGui::Text(currentDir.c_str());
+
+	if (ImGui::Button("<"))
+	{
+
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button(">"))
+	{
+
 	}
 
 	constexpr ImGuiTableFlags browserFlags = ImGuiTableFlags_SizingFixedSame
@@ -375,15 +413,9 @@ void ImGuiWrapper::ContentBrowser()
 	ImGui::TableNextRow();
 
 	int columnIndex = 0;
-	std::string path = "Models/Iggy/";
-	for (const auto& entry : fs::directory_iterator(path))
+	for (const auto& entry : fs::directory_iterator(currentDir))
 	{
-		string displayName = GetFileName(entry, path);
-		
-		// Hacked ... for now.
-		if (entry.path().extension() == ".mtl") continue;
-
-		ImGui::TableSetColumnIndex(columnIndex);-
+		ImGui::TableSetColumnIndex(columnIndex);
 		columnIndex++;
 
 		if (columnIndex >= tableLength)
@@ -392,12 +424,21 @@ void ImGuiWrapper::ContentBrowser()
 			ImGui::TableNextRow();
 		}
 
-		std::weak_ptr<TextureClass> iconTexture = Texture_Flyweight::FindTexture(entry.path().string(), m_DevicePtr.Get(), m_DevConPtr.Get());
-		if (iconTexture.expired()) continue;
+		string displayName = GetFileName(entry, currentDir);
+		
+		if (entry.path().extension() == ".png" || entry.path().extension() == ".obj")
+		{
+			DisplayTexture(entry, displayName);
+		}
+		else if (entry.is_directory())
+		{
+			// If folder is clicked on exit the draw early.
+			if (DisplayFolder(entry, displayName))
+			{
+				break;
+			}
+		}
 
-		// Draw UI.
-		ImGui::Image((ImTextureID)(intptr_t)iconTexture.lock()->GetTexture(), ImVec2(50, 50));
-		ImGui::Text((char*)displayName.c_str());
 	}
 
 	ImGui::EndTable();

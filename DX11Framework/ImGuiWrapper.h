@@ -20,6 +20,7 @@
 #include "Blurring.h"
 
 class GameObject;
+class TextureClass;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -47,7 +48,10 @@ public:
 	void AcceptLoad(GameObject* object);
 	void AcceptLoadRoot();
 
+	// Content Browser.
 	std::string GetFileName(std::filesystem::directory_entry entry, std::string path);
+	void DisplayTexture(std::filesystem::directory_entry entry, std::string displayName);
+	bool DisplayFolder(std::filesystem::directory_entry entry, std::string displayName);
 	void ContentBrowser();
 
 
@@ -88,6 +92,8 @@ private:
 
 	int m_selectedItem = 0;
 	const char* m_shapeList[7] = { "Cube", "Plane","Sphere", "Cylinder", "Cone", "Torus", "Dragon" };
+
+	TextureClass* m_folderTexture = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D11Device> m_DevicePtr;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DevConPtr;
