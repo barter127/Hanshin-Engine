@@ -9,8 +9,10 @@
 #include <d3d11_4.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
+#include <wrl.h>
 
 #include <string>
+#include <filesystem>
 #include <vector>
 #include <memory>
 
@@ -44,6 +46,9 @@ public:
 	bool CreateSceneNode(GameObject* object);
 	void AcceptLoad(GameObject* object);
 	void AcceptLoadRoot();
+
+	std::string GetFileName(std::filesystem::directory_entry entry, std::string path);
+	void ContentBrowser();
 
 
 	bool SaveChanges();
@@ -83,6 +88,10 @@ private:
 
 	int m_selectedItem = 0;
 	const char* m_shapeList[7] = { "Cube", "Plane","Sphere", "Cylinder", "Cone", "Torus", "Dragon" };
+
+	Microsoft::WRL::ComPtr<ID3D11Device> m_DevicePtr;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DevConPtr;
+	HWND m_WindowHandle;
 };
 
 #endif // !IMGUI_WRAPPER_H

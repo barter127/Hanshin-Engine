@@ -120,6 +120,8 @@ void ApplicationLayer::Update(float deltaTime)
 
 	m_ui->SceneGraph(m_objVector);
 
+    m_ui->ContentBrowser();
+
     if (Input::GetKeyDown('1'))
     {
         // Increment current cam.

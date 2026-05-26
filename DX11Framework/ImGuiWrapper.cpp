@@ -7,9 +7,15 @@
 
 #include "GameObject.h"
 #include "TransformComponent.h"
+#include "TextureClass.h"
+#include "TextureFlyweight.h"
+
+#include <filesystem>
+#include <iostream>
 
 using namespace DirectX;
 using namespace std;
+namespace fs = std::filesystem;
 
 bool ImGuiWrapper::m_initalised = false;
 
@@ -21,6 +27,8 @@ ImGuiWrapper::~ImGuiWrapper()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
+
+TextureClass* texture = new TextureClass;
 
 void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceContext* deviceCon)
 {
@@ -54,6 +62,18 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(device, deviceCon);
+
+	m_DevicePtr = device;
+	m_DevConPtr = deviceCon;
+	m_WindowHandle = hwnd;
+
+	texture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Models/Iggy/iggy_BaseColor.png");
+
+	std::string path = "Models/Iggy/";
+	for (const auto& entry : fs::directory_iterator(path))
+	{
+		Texture_Flyweight::FindTexture(entry.path().string(), device, deviceCon);
+	}
 
 	m_initalised = true;
 }
@@ -114,11 +134,15 @@ void ImGuiWrapper::DockSpace()
 		ImGuiID dockRightID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Right, 0.2, nullptr, &dockMainId);
 		ImGui::DockBuilderSetNodeSize(dockRightID, ImVec2{200, 600});
 
+		ImGuiID dockBottomID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Down, 0.2, nullptr, &dockMainId);
+		ImGui::DockBuilderSetNodeSize(dockBottomID, ImVec2{200, 300});
+
 		// Dock windows
 		ImGui::DockBuilderDockWindow("Viewport", dockMainId);
 		ImGui::DockBuilderDockWindow("Transform", dockLeftID);
 		ImGui::DockBuilderDockWindow("New", dockIDNewObj);
 		ImGui::DockBuilderDockWindow("Scene Graph", dockRightID);
+		ImGui::DockBuilderDockWindow("Content", dockBottomID);
 
 		ImGui::DockBuilderFinish(dockspaceID);
 	}
@@ -314,6 +338,70 @@ void ImGuiWrapper::AcceptLoadRoot()
 
 		ImGui::EndDragDropTarget();
 	}
+}
+
+string ImGuiWrapper::GetFileName(fs::directory_entry entry, string path)
+{
+	constexpr int substringLength = 10;
+	
+	// Remove the part of the path that has the directory.
+	std::string outputName = entry.path().string().substr(path.length(), substringLength);
+
+	int fileNameLength = entry.path().string().length() - path.length();
+	if (fileNameLength > substringLength)
+		outputName.append("..."); // This can have 4 dots on filenames of a certain length.
+
+	return outputName;
+}
+
+void ImGuiWrapper::ContentBrowser()
+{
+	ImGui::ShowDemoWindow();
+
+	ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoCollapse;
+	if (!ImGui::Begin("Content", nullptr, winFlags))
+	{
+		ImGui::End();
+	}
+
+	constexpr ImGuiTableFlags browserFlags = ImGuiTableFlags_SizingFixedSame
+		| ImGuiTableFlags_PadOuterX;
+
+	constexpr int tableWidth = 4;
+	int tableLength = 11;
+
+	ImGui::BeginTable("Tile Map Table", tableLength, browserFlags);
+
+	ImGui::TableNextRow();
+
+	int columnIndex = 0;
+	std::string path = "Models/Iggy/";
+	for (const auto& entry : fs::directory_iterator(path))
+	{
+		string displayName = GetFileName(entry, path);
+		
+		// Hacked ... for now.
+		if (entry.path().extension() == ".mtl") continue;
+
+		ImGui::TableSetColumnIndex(columnIndex);-
+		columnIndex++;
+
+		if (columnIndex >= tableLength)
+		{
+			columnIndex = 0;
+			ImGui::TableNextRow();
+		}
+
+		std::weak_ptr<TextureClass> iconTexture = Texture_Flyweight::FindTexture(entry.path().string(), m_DevicePtr.Get(), m_DevConPtr.Get());
+		if (iconTexture.expired()) continue;
+
+		// Draw UI.
+		ImGui::Image((ImTextureID)(intptr_t)iconTexture.lock()->GetTexture(), ImVec2(50, 50));
+		ImGui::Text((char*)displayName.c_str());
+	}
+
+	ImGui::EndTable();
+	ImGui::End();
 }
 
 bool ImGuiWrapper::CreateSceneNode(GameObject* object)
