@@ -9,6 +9,7 @@
 #include "TransformComponent.h"
 #include "TextureClass.h"
 #include "TextureFlyweight.h"
+#include "HelperMacros.h"
 
 #include <filesystem>
 #include <iostream>
@@ -28,6 +29,8 @@ ImGuiWrapper::~ImGuiWrapper()
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+
+	DELETE_PTR(m_folderTexture)
 }
 
 void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceContext* deviceCon)
@@ -454,7 +457,7 @@ bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 	else
 		flag |= ImGuiTreeNodeFlags_OpenOnArrow;
 
-	if (ImGui::TreeNodeEx((char*)object->m_name.c_str(), flag))
+	if (ImGui::TreeNodeEx(StringToCharPtr(object->m_name), flag))
 	{
 		AcceptLoad(object);
 
