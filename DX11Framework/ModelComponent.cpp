@@ -143,9 +143,6 @@ Mesh ModelComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		constexpr aiTextureType textureTypes[] =
 		{
 			aiTextureType_DIFFUSE,
-			aiTextureType_HEIGHT,
-			aiTextureType_SHININESS,
-			aiTextureType_AMBIENT
 		};
 
 		for (aiTextureType type : textureTypes)

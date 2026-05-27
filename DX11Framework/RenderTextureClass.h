@@ -23,8 +23,8 @@ public:
     int GetTextureWidth();
     int GetTextureHeight();
 
-private:
     int m_textureWidth, m_textureHeight;
+private:
     ID3D11Texture2D* m_renderTargetTexture;
     ID3D11RenderTargetView* m_renderTargetView;
     ID3D11ShaderResourceView* m_shaderResourceView;

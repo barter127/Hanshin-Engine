@@ -74,7 +74,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	m_folderTexture = new TextureClass;
 	m_folderTexture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Engine Assets/folder.png");
 
-	pathStack.push(currentDir);
+	m_pathStack.push(currentDir);
 
 	m_initalised = true;
 }
@@ -215,7 +215,7 @@ void ImGuiWrapper::ViewportUpdate(ID3D11DeviceContext* deviceCon)
 	// Display Viewport.
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	ImVec2 size = { viewportPanelSize.x, viewportPanelSize.y };
-
+	
 	ImGui::Image((ImTextureID)(intptr_t)m_viewportTexture->GetShaderResourceView(), ImVec2{ size.x, size.y }, ImVec2{ 0, 0 }, ImVec2{ 1, 1 });
 
 	ImGui::End();
@@ -389,8 +389,8 @@ void ImGuiWrapper::ExitCurrentFolder()
 {
 	if (m_pathStack.size() > 1)
 	{
-		pathStack.pop();
-		currentDir = pathStack.top();
+		m_pathStack.pop();
+		currentDir = m_pathStack.top();
 	}
 }
 
