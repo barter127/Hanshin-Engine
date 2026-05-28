@@ -21,7 +21,7 @@ namespace fs = std::filesystem;
 
 bool ImGuiWrapper::m_initalised = false;
 
-static string currentDir = "Models/";
+static fs::directory_entry currentDir{ "Models" };
 
 ImGuiWrapper::ImGuiWrapper() {}
 
@@ -341,18 +341,26 @@ void ImGuiWrapper::AcceptLoadRoot()
 	}
 }
 
-string ImGuiWrapper::GetFileName(fs::directory_entry entry, string path)
+string ImGuiWrapper::GetFileName(fs::directory_entry entry)
 {
-	constexpr int substringLength = 10;
+	constexpr int maxFileName = 10;
 	
-	// Remove the part of the path that has the directory.
-	std::string outputName = entry.path().string().substr(path.length(), substringLength);
+	string fileName = entry.path().filename().string();
+	string extensionString = entry.path().extension().string();
 
-	int fileNameLength = entry.path().string().length() - path.length();
-	if (fileNameLength > substringLength)
-		outputName.append("..."); // This can have 4 dots on filenames of a certain length.
+	// Temporarily remove extension for name length check.
+	fileName.erase(fileName.length() - extensionString.length());
 
-	return outputName;
+	// Paths to files have a double back slash at the end. Remove this so it looks nicer.
+	if (fileName.length() > maxFileName)
+	{
+		fileName = fileName.substr(0, maxFileName);
+		fileName.append(".."); // This can have 4 dots on filenames of a certain length.
+	}
+
+	fileName.append(extensionString);
+
+	return fileName;
 }
 
 void ImGuiWrapper::DisplayTexture(fs::directory_entry entry, string displayName)
@@ -381,8 +389,8 @@ bool ImGuiWrapper::DisplayFolder(fs::directory_entry entry, string displayName)
 
 void ImGuiWrapper::EnterFolder(fs::directory_entry entry)
 {
-	currentDir = entry.path().string();
-	m_pathVector.push_back(entry.path().string());
+	currentDir = entry;
+	m_pathVector.push_back(entry);
 }
 
 void ImGuiWrapper::ExitCurrentFolder()
@@ -396,36 +404,19 @@ void ImGuiWrapper::ExitCurrentFolder()
 
 void ImGuiWrapper::PathToolbar()
 {
-	auto FormatButtonText = [=](int currentIndex, int previousIndex)
-		{
-			// Here we assume that the index is 0 and pop the last charcter so the button doesn't display a slash.
-			if (previousIndex <= -1)
-			{
-				string returnStr = m_pathVector[0];
-				returnStr.pop_back();
-				return returnStr;
-			}
-
-			string currentDir = m_pathVector[currentIndex];
-			string previousDir = m_pathVector[previousIndex];
-		
-			int substrLength = currentDir.size() - previousDir.size();
-			return currentDir.substr(previousDir.size(), substrLength);
-		};
-
 	for (int i = 0; i < m_pathVector.size(); i++)
 	{
 
-		string test = FormatButtonText(i, i - 1);
-		if (ImGui::Button(test.c_str()))
+		string buttonName = m_pathVector[i].path().filename().string();
+		if (ImGui::Button(buttonName.c_str()))
 		{
+			currentDir = m_pathVector[i];
+
 			int targetIndex = m_pathVector.size() - i;
 			for (int i = 1; i < m_pathVector.size(); i++)
 			{
 				m_pathVector.pop_back();
 			}
-
-			currentDir = m_pathVector[i];
 		}
 
 		if (i < m_pathVector.size() - 1)
@@ -439,8 +430,6 @@ void ImGuiWrapper::PathToolbar()
 
 void ImGuiWrapper::ContentBrowser()
 {
-	ImGui::ShowDemoWindow();
-
 	ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoCollapse;
 	if (!ImGui::Begin("Content", nullptr, winFlags))
 	{
@@ -480,7 +469,7 @@ void ImGuiWrapper::ContentBrowser()
 			ImGui::TableNextRow();
 		}
 
-		string displayName = GetFileName(entry, currentDir);
+		string displayName = GetFileName(entry);
 		
 		if (entry.path().extension() == ".png" || entry.path().extension() == ".obj")
 		{
