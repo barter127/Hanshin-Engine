@@ -12,11 +12,9 @@ using namespace std;
 
 ModelComponent::ModelComponent() {}
 
-ModelComponent::ModelComponent(const ModelComponent& other) {}
-
 ModelComponent::~ModelComponent() 
 {
-	Shutdown();
+	Release();
 }
 
 bool ModelComponent::Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* modelFilename) 
@@ -43,7 +41,7 @@ bool ModelComponent::Initialise(ID3D11Device* device, ID3D11DeviceContext* devic
 	return true;
 }
 
-void ModelComponent::Shutdown()
+void ModelComponent::Release()
 {
 	for (int i = 0; i < m_meshes.size(); i++)
 	{
@@ -74,6 +72,8 @@ int ModelComponent::GetIndexCount()
 {
 	return m_indexCount;
 }
+
+#pragma region Model Loading
 
 void ModelComponent::ProcessNode(aiNode* node, const aiScene* scene)
 {
@@ -188,3 +188,5 @@ void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, s
 		}
 	}
 }
+
+#pragma endregion

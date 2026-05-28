@@ -19,16 +19,18 @@ public:
 	GameObject(ID3D11Device* device, HWND windowHandle);
 	~GameObject();
 
+	void Update(float deltaTime);
+	void Render(ID3D11DeviceContext* deviceCon, MatrixBuffer& mb);
+	void Release();
+
 	bool LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath);
 	std::string GetModelPath();
 
-	void Update(float deltaTime);
-	void Render(ID3D11DeviceContext* deviceCon, MatrixBuffer& mb);
+	TransformComponent* GetTransform();
 
 	inline bool IsChild() { return m_parent != nullptr; }
 
 public:
-	TransformComponent* m_transform = nullptr;
 	std::string m_name = "Default Object";
 
 	std::string m_modelPath = "";
@@ -47,8 +49,8 @@ private:
 private:
 	GameObject* m_parent = nullptr;
 
-	ModelComponent* m_model = nullptr;
-
+	std::unique_ptr<ModelComponent> m_model = nullptr;
+	std::unique_ptr<TransformComponent> m_transform = nullptr;
 
 	bool m_initialised = false;
 

@@ -54,7 +54,7 @@ bool Saving::LoadSceneFromJSON(string path, vector<shared_ptr<GameObject>>& scen
 		sceneVector.back().get()->LoadModel(device, devCon, (char*)modelPath.c_str());
 		sceneVector[i]->m_name = objName;
 
-		TransformComponent* transform = sceneVector.back()->m_transform;
+		TransformComponent* transform = sceneVector.back()->GetTransform();
 		transform->m_position = ReadXMFloat3("Position", objectDesc);
 		transform->m_rotation = (ReadXMFloat3("Rotation", objectDesc));
 		transform->m_scale = ReadXMFloat3("Scale", objectDesc);
@@ -118,7 +118,7 @@ bool Saving::SaveSceneFromJSON(string path, vector<shared_ptr<GameObject>>& scen
 		std::string modelPath = sceneVector[i]->m_modelPath;
 		std::string name = sceneVector[i]->m_name;
 
-		TransformComponent* transform = sceneVector[i]->m_transform;
+		TransformComponent* transform = sceneVector[i]->GetTransform();
 
 		gameObjectsJson.push_back(json::object(
 			{

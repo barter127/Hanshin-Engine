@@ -2,17 +2,19 @@
 
 #include "TransformComponent.h"
 #include "ModelComponent.h"
+#include "HelperMacros.h"
 
 using namespace DirectX;
 using namespace std;
 
+// TODO: rework selection.
 int GameObject::m_nextID = -1;
 
 GameObject::GameObject(ID3D11Device* device, HWND windowHandle)
 {
-	m_transform = new TransformComponent({ 0.0f, 0.0f, 0.0f },
-		{ 0.0f,0.0f,0.0f },
-		{ 1.0f,1.0f,1.0f });
+	m_transform = std::make_unique<TransformComponent>(XMFLOAT3(0.0f, 0.0f, 0.0f),
+		XMFLOAT3(0.0f, 0.0f, 0.0f),
+		XMFLOAT3(0.0f, 0.0f, 0.0f));
 
 	if (m_nextID != -1)
 	{
@@ -25,29 +27,8 @@ GameObject::GameObject(ID3D11Device* device, HWND windowHandle)
 
 GameObject::~GameObject()
 {
-	if (m_model) delete m_model;
-	if (m_transform) delete m_transform;
-}
-
-bool GameObject::LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath)
-{
-	bool result;
-	if (m_model) delete m_model;
-	m_model = new ModelComponent();
-
-	result = m_model->Initialise(device, deviceCon, modelPath);
-	if (!result)
-	{
-		return false;
-	}
-
-	m_modelPath = modelPath;
-	return true;
-}
-
-std::string GameObject::GetModelPath()
-{
-	return m_modelPath;
+	if (m_model) m_model.release();
+	if (m_transform) m_transform.release();
 }
 
 void GameObject::Update(float deltaTime)
@@ -70,6 +51,32 @@ void GameObject::Render(ID3D11DeviceContext* deviceCon, MatrixBuffer& mb)
 		mb.World *= XMMatrixTranspose(m_transform->GetInverseMatrix());
 	}
 }
+
+void GameObject::Release()
+{
+	if (m_model) m_model.release();
+	if (m_transform) m_transform.release();
+}
+
+bool GameObject::LoadModel(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath)
+{
+	bool result;
+	if (!m_model)
+		m_model = std::make_unique<ModelComponent>();
+
+	result = m_model->Initialise(device, deviceCon, modelPath);
+	if (!result)
+	{
+		return false;
+	}
+
+	m_modelPath = modelPath;
+	return true;
+}
+
+std::string GameObject::GetModelPath() { return m_modelPath; }
+
+TransformComponent* GameObject::GetTransform() { return m_transform.get(); }
 
 void GameObject::AddChild(GameObject* goPtr)
 {

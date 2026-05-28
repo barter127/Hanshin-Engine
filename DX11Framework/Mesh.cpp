@@ -1,6 +1,7 @@
 #include "Mesh.h"
 
 #include "Texture.h"
+#include "HelperMacros.h"
 
 using namespace DirectX;
 
@@ -16,7 +17,7 @@ Mesh::Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<U
 
 Mesh::~Mesh() 
 {
-	// Release();
+
 }
 
 void Mesh::Initialise(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices)
@@ -63,15 +64,13 @@ void Mesh::Release()
 	// Release the index buffer.
 	if (m_indexBuffer)
 	{
-		m_indexBuffer->Release();
-		m_indexBuffer = nullptr;
+		DELETE_PTR(m_indexBuffer)
 	}
 
 	// Release the vertex buffer.
 	if (m_vertexBuffer)
 	{
-		m_vertexBuffer->Release();
-		m_vertexBuffer = nullptr;
+		DELETE_PTR(m_indexBuffer)
 	}
 }
 

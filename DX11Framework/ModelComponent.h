@@ -20,16 +20,8 @@ struct VertexType;
 
 class ModelComponent
 {
-	struct ModelType
-	{
-		float x, y, z;
-		float tu, tv;
-		float nx, ny, nz;
-	};
-
 public:
 	ModelComponent();
-	ModelComponent(const ModelComponent&);
 	~ModelComponent();
 
 	/*
@@ -39,7 +31,7 @@ public:
 	bool Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* modelPath);
 
 	// \brief Releases the texture data, buffers, and model data.
-	void Shutdown();
+	void Release();
 
 	// \brief Renders the textured model to the screen.
 	void Render(ID3D11DeviceContext* deviceCon, MatrixBuffer& mb);
