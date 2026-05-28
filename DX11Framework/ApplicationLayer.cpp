@@ -77,40 +77,40 @@ void ApplicationLayer::Update(float deltaTime)
 {
     m_camVector[m_activeCamera]->Update(deltaTime);
 
-    m_ui->Update(deltaTime);
+    m_ui->StartUpdate(deltaTime);
 
     switch (m_ui->NewObjectPanel())
     {
     case m_ui->Primitives::Cube:
-        CreateNewObject((char*)"Primitives/Prim_Cube.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Cube.obj");
         break;
 
     case m_ui->Primitives::Plane:
-        CreateNewObject((char*)"Primitives/Prim_Plane.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Plane.obj");
         break;
 
     case m_ui->Primitives::Sphere:
-        CreateNewObject((char*)"Primitives/Prim_Sphere.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Sphere.obj");
         break;
 
     case m_ui->Primitives::Cylinder:
-        CreateNewObject((char*)"Primitives/Prim_Cylinder.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Cylinder.obj");
         break;
 
     case m_ui->Primitives::Cone:
-        CreateNewObject((char*)"Primitives/Prim_Cone.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Cone.obj");
         break;
 
     case m_ui->Primitives::Torus:
-        CreateNewObject((char*)"Primitives/Prim_Torus.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/Prim_Torus.obj");
         break;
 
     case m_ui->Primitives::Dragon:
-        CreateNewObject((char*)"Primitives/dragon.obj", (char*)"stone01.tga");
+        CreateNewObject((char*)"Primitives/dragon.obj");
         break;
     }
 
-    m_ui->TransformPanel(*m_objVector[m_ui->GetSelectedIndex()]);
+    m_ui->TransformPanel(*m_objVector[0]);
 
 
     //m_ui->LightPanel(m_pointLight->GetAmbientColour(),
@@ -171,7 +171,7 @@ void ApplicationLayer::Draw(MatrixBuffer& mb, DX11Framework* dx)
     m_ui->Render();
 }
 
-void ApplicationLayer::CreateNewObject(char* modelPath, char* texturePath)
+void ApplicationLayer::CreateNewObject(char* modelPath)
 {
     m_objVector.emplace_back(std::make_shared<GameObject>(m_DevicePtr.Get(), m_WindowHandle));
     bool result = m_objVector.back()->LoadModel(m_DevicePtr.Get(), m_DevConPtr.Get(), modelPath);

@@ -19,7 +19,7 @@ using namespace DirectX;
 using namespace std;
 namespace fs = std::filesystem;
 
-bool ImGuiWrapper::m_initalised = false;
+bool ImGuiWrapper::s_initialised = false;
 
 static fs::directory_entry currentDir{ "Models" };
 
@@ -37,7 +37,7 @@ ImGuiWrapper::~ImGuiWrapper()
 void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceContext* deviceCon)
 {
 	IMGUI_CHECKVERSION();
-	// Make process DPI aware and obtain main monitor scale
+	// Make process DPI aware and obtain main monitor scale.
 	ImGui_ImplWin32_EnableDpiAwareness();
 	float main_scale = ImGui_ImplWin32_GetDpiScaleForHwnd(hwnd);
 
@@ -67,16 +67,19 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(device, deviceCon);
 
+	// Store variables that will be reused later.
 	m_DevicePtr = device;
 	m_DevConPtr = deviceCon;
 	m_WindowHandle = hwnd;
 
+	// Load folder Texture.
 	m_folderTexture = new Texture;
 	m_folderTexture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Engine Assets/folder.png");
 
+	// Init the list of path vectors used in the path toolbar.
 	m_pathVector.push_back(currentDir);
 
-	m_initalised = true;
+	s_initialised = true;
 }
 
 void ImGuiWrapper::Shutdown()
@@ -85,17 +88,19 @@ void ImGuiWrapper::Shutdown()
 	ImGui_ImplWin32_Shutdown();
 
 	ImGui::DestroyContext();
+
+	DELETE_PTR(m_folderTexture);
 }
 
 void ImGuiWrapper::DockSpace()
 {
 	constexpr bool open = false;
-	constexpr bool opt_fullscreen = true;
-	constexpr ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	constexpr bool optFullscreen = true;
+	constexpr ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 	static bool dockspaceBuilt = false;
 
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
-	if (opt_fullscreen)
+	if (optFullscreen)
 	{
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
@@ -115,7 +120,7 @@ void ImGuiWrapper::DockSpace()
 
 	// DockSpace
 	ImGuiID dockspaceID = ImGui::GetID("DockSpace");
-	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspace_flags);
+	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
 	if (!dockspaceBuilt)
 	{
@@ -127,23 +132,23 @@ void ImGuiWrapper::DockSpace()
 		// Split the dockspace into 3 parts.
 		ImGuiID dockMainId = dockspaceID;
 
-		ImGuiID dockLeftID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Left, 0.5f, nullptr, &dockMainId);
-		ImGui::DockBuilderSetNodeSize(dockLeftID, ImVec2{300, 600});
+		ImGuiID transformID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Left, 0.5f, nullptr, &dockMainId);
+		ImGui::DockBuilderSetNodeSize(transformID, ImVec2{300, 600});
 
-		ImGuiID dockIDNewObj = ImGui::DockBuilderSplitNode(dockLeftID, ImGuiDir_Down, 0.3f, nullptr, &dockLeftID);
+		ImGuiID newObjId = ImGui::DockBuilderSplitNode(transformID, ImGuiDir_Down, 0.3f, nullptr, &transformID);
 
-		ImGuiID dockRightID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Right, 0.2, nullptr, &dockMainId);
-		ImGui::DockBuilderSetNodeSize(dockRightID, ImVec2{200, 600});
+		ImGuiID sceneGraphID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Right, 0.2, nullptr, &dockMainId);
+		ImGui::DockBuilderSetNodeSize(sceneGraphID, ImVec2{200, 600});
 
-		ImGuiID dockBottomID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Down, 0.2, nullptr, &dockMainId);
-		ImGui::DockBuilderSetNodeSize(dockBottomID, ImVec2{200, 300});
+		ImGuiID contentBrowerID = ImGui::DockBuilderSplitNode(dockMainId, ImGuiDir_Down, 0.2, nullptr, &dockMainId);
+		ImGui::DockBuilderSetNodeSize(contentBrowerID, ImVec2{200, 300});
 
 		// Dock windows
 		ImGui::DockBuilderDockWindow("Viewport", dockMainId);
-		ImGui::DockBuilderDockWindow("Transform", dockLeftID);
-		ImGui::DockBuilderDockWindow("New", dockIDNewObj);
-		ImGui::DockBuilderDockWindow("Scene Graph", dockRightID);
-		ImGui::DockBuilderDockWindow("Content", dockBottomID);
+		ImGui::DockBuilderDockWindow("Transform", transformID);
+		ImGui::DockBuilderDockWindow("New", newObjId);
+		ImGui::DockBuilderDockWindow("Scene Graph", sceneGraphID);
+		ImGui::DockBuilderDockWindow("Content", contentBrowerID);
 
 		ImGui::DockBuilderFinish(dockspaceID);
 	}
@@ -151,7 +156,7 @@ void ImGuiWrapper::DockSpace()
 	ImGui::End();
 }
 
-void ImGuiWrapper::Update(float deltaTime)
+void ImGuiWrapper::StartUpdate(float deltaTime)
 {
 	ImGui_ImplWin32_NewFrame();
 	ImGui_ImplDX11_NewFrame();
@@ -173,7 +178,10 @@ void ImGuiWrapper::Render()
 
 void ImGuiWrapper::TransformPanel(GameObject& obj)
 {
-	ImGui::Begin("Transform");
+	if (!ImGui::Begin("Transform"))
+	{
+		ImGui::End();
+	}
 
 	constexpr int maxNameSize = 256;
 	ImGui::Text("Name");
@@ -181,23 +189,17 @@ void ImGuiWrapper::TransformPanel(GameObject& obj)
 	ImGui::InputText("##TransformName", (char*)obj.m_name.c_str(), maxNameSize);
 	ImGui::NewLine();
 
-
-
-
-	int index = 0;
 	constexpr int resetToZero = 0;
 	constexpr int resetToOne = 1;
 
 	// Position
-	DrawVec3Control(obj.m_transform->m_position, "Position", index, resetToZero);
+	DrawVec3Control(obj.m_transform->m_position, "Position", resetToZero);
 
 	// Rotation
-	index++;
-	DrawVec3Control(obj.m_transform->m_rotation, "Rotation", index, resetToZero);
+	DrawVec3Control(obj.m_transform->m_rotation, "Rotation", resetToZero);
 
 	// Scale
-	index++;
-	DrawVec3Control(obj.m_transform->m_scale, "Scale", index, resetToOne);
+	DrawVec3Control(obj.m_transform->m_scale, "Scale", resetToOne);
 
 	ImGui::End();
 }
@@ -210,7 +212,10 @@ void ImGuiWrapper::ViewportStart(ID3D11DeviceContext* deviceCon)
 
 void ImGuiWrapper::ViewportUpdate(ID3D11DeviceContext* deviceCon)
 {
-	ImGui::Begin("Viewport");
+	if (!ImGui::Begin("Viewport"))
+	{
+		ImGui::End();
+	}
 
 	// Display Viewport.
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
@@ -221,18 +226,18 @@ void ImGuiWrapper::ViewportUpdate(ID3D11DeviceContext* deviceCon)
 	ImGui::End();
 }
 
-
 int ImGuiWrapper::NewObjectPanel()
 {
 	int returnItem = -1;
 
-	ImGui::Begin("New");
+	if (!ImGui::Begin("New"))
+		ImGui::End();
+
 	ImGui::Combo("Object Type", &m_selectedItem, m_shapeList, IM_ARRAYSIZE(m_shapeList));
 
 	if (ImGui::Button("New Obj"))
-	{
 		returnItem = m_selectedItem;
-	}
+
 	ImGui::End();
 
 	return returnItem;
@@ -242,12 +247,11 @@ bool ImGuiWrapper::SaveChanges()
 {
 	bool isPressed = false;
 
-	ImGui::Begin("Save");
+	if (!ImGui::Begin("Save"))
+		ImGui::End();
 
 	if (ImGui::Button("Save Changes"))
-	{
 		isPressed = true;
-	}
 
 	ImGui::End();
 
@@ -263,7 +267,8 @@ void ImGuiWrapper::LightPanel(float* ambientCol, float* diffuseCol,
 	constexpr float minSpecPower = 1.0f; 
 	constexpr float maxSpecPower = 64.0f; 
 
-	ImGui::Begin("Edit Light");
+	if (!ImGui::Begin("Edit Light"))
+		ImGui::End();
 
 	ImGui::ColorEdit4("Ambient Colour", ambientCol);
 
@@ -287,18 +292,20 @@ void ImGuiWrapper::LightPanel(float* ambientCol, float* diffuseCol,
 }
 
 
-void ImGuiWrapper::AcceptLoad(GameObject* object)
+void ImGuiWrapper::HandleSceneNodeLoad(GameObject* object)
 {
+	const char* sceneNodeLabel = "Scene Graph Node";
+
 	if (ImGui::BeginDragDropSource())
 	{
-		ImGui::SetDragDropPayload("Scene Graph Node", &object, sizeof(nullptr));
-		ImGui::Text((char*)object->m_name.c_str());
+		ImGui::SetDragDropPayload(sceneNodeLabel, &object, sizeof(nullptr));
+		ImGui::Text(STRING_TO_CHARPTR(object->m_name));
 		ImGui::EndDragDropSource();
 	}
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene Graph Node");
+		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(sceneNodeLabel);
 
 		if (payload)
 		{
@@ -317,12 +324,13 @@ void ImGuiWrapper::AcceptLoad(GameObject* object)
 	}
 }
 
-void ImGuiWrapper::AcceptLoadRoot()
+void ImGuiWrapper::HandleRootNode()
 {
+	const char* sceneNodeLabel = "Scene Graph Node";
+
 	if (ImGui::BeginDragDropTarget())
 	{
-		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene Graph Node");
-
+		const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(sceneNodeLabel);
 
 		if (payload)
 		{
@@ -370,12 +378,12 @@ void ImGuiWrapper::DisplayTexture(fs::directory_entry entry, string displayName)
 
 	// Draw UI.
 	ImGui::Image((ImTextureID)(intptr_t)iconTexture.lock()->GetTexture(), ImVec2(50, 50));
-	ImGui::Text((char*)displayName.c_str());
+	ImGui::Text(STRING_TO_CHARPTR(displayName));
 }
 
 bool ImGuiWrapper::DisplayFolder(fs::directory_entry entry, string displayName)
 {
-	string buttonID = "##" + displayName;
+	string buttonID = "##unique_id";
 	if (ImGui::ImageButton(buttonID.c_str(), (ImTextureID)(intptr_t)m_folderTexture->GetTexture(), ImVec2(50, 50)))
 	{
 		EnterFolder(entry);
@@ -393,21 +401,12 @@ void ImGuiWrapper::EnterFolder(fs::directory_entry entry)
 	m_pathVector.push_back(entry);
 }
 
-void ImGuiWrapper::ExitCurrentFolder()
-{
-	if (m_pathVector.size() > 1)
-	{
-		m_pathVector.pop_back();
-		currentDir = m_pathVector.back();
-	}
-}
-
 void ImGuiWrapper::PathToolbar()
 {
 	for (int i = 0; i < m_pathVector.size(); i++)
 	{
-
 		string buttonName = m_pathVector[i].path().filename().string();
+
 		if (ImGui::Button(buttonName.c_str()))
 		{
 			currentDir = m_pathVector[i];
@@ -436,15 +435,9 @@ void ImGuiWrapper::ContentBrowser()
 		ImGui::End();
 	}
 
-	// ImGui::Text(currentDir.c_str());
-
 	PathToolbar();
 
-	if (ImGui::Button("<"))
-	{
-		ExitCurrentFolder();
-
-	}
+	// === Draw Content (Images/Names) in the browser ===
 
 	constexpr ImGuiTableFlags browserFlags = ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_PadOuterX;
 
@@ -501,7 +494,7 @@ bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 
 	if (ImGui::TreeNodeEx(STRING_TO_CHARPTR(object->m_name), flag))
 	{
-		AcceptLoad(object);
+		HandleSceneNodeLoad(object);
 
 		// Display children.
 		list<GameObject*>::iterator iter;
@@ -520,13 +513,16 @@ bool ImGuiWrapper::CreateSceneNode(GameObject* object)
 
 void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 {
-	ImGui::Begin("Scene Graph");
+	if (!ImGui::Begin("Scene Graph"))
+	{
+		ImGui::End();
+	}
 
 	constexpr ImGuiTreeNodeFlags rootFlag = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
 
 	if (ImGui::TreeNodeEx("Level Name", rootFlag))
 	{
-		AcceptLoadRoot();
+		HandleRootNode();
 
 		// Create scene nodes for parents. Child nodes are handled inside CreateSceneNode().
 		for (shared_ptr<GameObject> objSPtr : objVector)
@@ -544,9 +540,11 @@ void ImGuiWrapper::SceneGraph(vector<shared_ptr<GameObject>>& objVector)
 	ImGui::End();
 }
 
-void ImGuiWrapper::DrawVec3Control(XMFLOAT3& vector, std::string displayString, int index,float resetTo, float columnWidth, float barWidth)
+void ImGuiWrapper::DrawVec3Control(XMFLOAT3& vector, std::string displayString, float resetTo, float columnWidth, float barWidth)
 {
-	std::string id = "##Table" + index;
+	static int index = 0;
+
+	std::string id = "##unique_id";
 
 	bool tableCreated = ImGui::BeginTable(id.c_str(), 2, ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_SizingFixedFit);
 
@@ -633,50 +631,50 @@ void ImGuiWrapper::DrawVec3Control(XMFLOAT3& vector, std::string displayString, 
 
 #pragma region Blurring
 
-void ImGuiWrapper::BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon)
-{
-	m_blurring->CopyViewport(device, deviceCon, m_viewportTexture->GetShaderResourceView());
-}
-
-void ImGuiWrapper::GaussianBlur(ID3D11DeviceContext* devCon)
-{
-	m_blurring->Gaussian(devCon);
-}
-
-void ImGuiWrapper::BlurredViewportUpdate(ID3D11DeviceContext* deviceCon)
-{
-	ImGui::Begin("Blurred Viewport");
-
-	// Display Viewport.
-	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	ImVec2 size = { viewportPanelSize.x, viewportPanelSize.y };
-
-	ImGui::Image((ImTextureID)(intptr_t)m_blurring->GetShaderResourceView(), ImVec2{ size.x, size.y }, ImVec2{ 0, 0 }, ImVec2{ 1, 1 });
-
-	ImGui::End();
-}
-
-void ImGuiWrapper::GaussDataPanel()
-{
-	constexpr int intSliderSpeed = 1;
-	constexpr int minKernel = 1;
-	constexpr int maxKernel = 10;
-
-	constexpr float floatSliderSpeed = 0.1f;
-	constexpr float minSamplePos = 0.0f;
-	constexpr float maxSamplePos = 100.0f;
-
-	constexpr float minSigma = 0.1f;
-	constexpr float maxSigma = 10.0f; // Literally me.
-
-	ImGui::Begin("Edit Gaussian Data");
-
-	ImGui::DragInt("Kernel Size", &m_blurring->m_gaussData.KernelSize, intSliderSpeed, minKernel, maxKernel);
-	ImGui::DragFloat("Sample Pos Multiplier", &m_blurring->m_gaussData.SamplePosMultiplier, floatSliderSpeed, minSamplePos, maxSamplePos);
-	ImGui::DragFloat("Sigma", &m_blurring->m_gaussData.Sigma, floatSliderSpeed, minSigma, maxSigma);
-
-
-	ImGui::End();
-}
+//void ImGuiWrapper::BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon)
+//{
+//	m_blurring->CopyViewport(device, deviceCon, m_viewportTexture->GetShaderResourceView());
+//}
+//
+//void ImGuiWrapper::GaussianBlur(ID3D11DeviceContext* devCon)
+//{
+//	m_blurring->Gaussian(devCon);
+//}
+//
+//void ImGuiWrapper::BlurredViewportUpdate(ID3D11DeviceContext* deviceCon)
+//{
+//	ImGui::Begin("Blurred Viewport");
+//
+//	// Display Viewport.
+//	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+//	ImVec2 size = { viewportPanelSize.x, viewportPanelSize.y };
+//
+//	ImGui::Image((ImTextureID)(intptr_t)m_blurring->GetShaderResourceView(), ImVec2{ size.x, size.y }, ImVec2{ 0, 0 }, ImVec2{ 1, 1 });
+//
+//	ImGui::End();
+//}
+//
+//void ImGuiWrapper::GaussDataPanel()
+//{
+//	constexpr int intSliderSpeed = 1;
+//	constexpr int minKernel = 1;
+//	constexpr int maxKernel = 10;
+//
+//	constexpr float floatSliderSpeed = 0.1f;
+//	constexpr float minSamplePos = 0.0f;
+//	constexpr float maxSamplePos = 100.0f;
+//
+//	constexpr float minSigma = 0.1f;
+//	constexpr float maxSigma = 10.0f; // Literally me.
+//
+//	ImGui::Begin("Edit Gaussian Data");
+//
+//	ImGui::DragInt("Kernel Size", &m_blurring->m_gaussData.KernelSize, intSliderSpeed, minKernel, maxKernel);
+//	ImGui::DragFloat("Sample Pos Multiplier", &m_blurring->m_gaussData.SamplePosMultiplier, floatSliderSpeed, minSamplePos, maxSamplePos);
+//	ImGui::DragFloat("Sigma", &m_blurring->m_gaussData.Sigma, floatSliderSpeed, minSigma, maxSigma);
+//
+//
+//	ImGui::End();
+//}
 
 #pragma endregion

@@ -26,7 +26,7 @@ public:
 	void Draw(MatrixBuffer& mb, DX11Framework* dx);
 
 private:
-	void CreateNewObject(char* modelPath, char* texturePath);
+	void CreateNewObject(char* modelPath);
 
 	ImGuiWrapper* m_ui;
 

@@ -34,7 +34,7 @@ public:
 	void Initialise(HWND hwnd, ID3D11Device* device,  ID3D11DeviceContext* deviceCon);
 	void Shutdown();
 
-	void Update(float deltaTime);
+	void StartUpdate(float deltaTime);
 	void Render();
 
 	void TransformPanel(GameObject& obj);
@@ -42,12 +42,11 @@ public:
 	void LightPanel(float* ambientCol, float* diffuseCol,
 		float* specularCol, float* specularPower,
 		DirectX::XMFLOAT4& lightDir);
-	void GaussDataPanel();
 
 	void SceneGraph(std::vector<std::shared_ptr<GameObject>>& objVector);
 	bool CreateSceneNode(GameObject* object);
-	void AcceptLoad(GameObject* object);
-	void AcceptLoadRoot();
+	void HandleSceneNodeLoad(GameObject* object);
+	void HandleRootNode();
 
 	// Content Browser.
 	std::vector<std::filesystem::directory_entry> m_pathVector; // ordinarily I'd put this at the bottom but as I'm gonna refactor it's here.
@@ -56,7 +55,6 @@ public:
 	void DisplayTexture(std::filesystem::directory_entry entry, std::string displayName);
 	bool DisplayFolder(std::filesystem::directory_entry entry, std::string displayName);
 	void EnterFolder(std::filesystem::directory_entry entry);
-	void ExitCurrentFolder();
 	void PathToolbar();
 	void ContentBrowser();
 
@@ -65,9 +63,10 @@ public:
 
 	void ViewportStart(ID3D11DeviceContext* deviceCon);
 	void ViewportUpdate(ID3D11DeviceContext* deviceCon);
-	void BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon);
-	void GaussianBlur(ID3D11DeviceContext* devCon);
-	void BlurredViewportUpdate(ID3D11DeviceContext* deviceCon);
+	// void GaussDataPanel();
+	//void BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon);
+	//void GaussianBlur(ID3D11DeviceContext* devCon);
+	//void BlurredViewportUpdate(ID3D11DeviceContext* deviceCon);
 
 	void DockSpace();
 
@@ -91,10 +90,10 @@ public:
 	Blurring* m_blurring = nullptr; // Maybe move this.
 
 private:
-	void DrawVec3Control(DirectX::XMFLOAT3& vector, std::string displayString, int index, float buttonVal = 0.0f, float columnWidth = 75.0f, float barWidth = 50.0f);
+	void DrawVec3Control(DirectX::XMFLOAT3& vector, std::string displayString, float buttonVal = 0.0f, float columnWidth = 75.0f, float barWidth = 50.0f);
 
 private:
-	static bool m_initalised;
+	static bool s_initialised;
 
 	int m_selectedItem = 0;
 	const char* m_shapeList[7] = { "Cube", "Plane","Sphere", "Cylinder", "Cone", "Torus", "Dragon" };
