@@ -74,7 +74,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	m_folderTexture = new TextureClass;
 	m_folderTexture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Engine Assets/folder.png");
 
-	m_pathStack.push(currentDir);
+	m_pathVector.push_back(currentDir);
 
 	m_initalised = true;
 }
@@ -382,15 +382,15 @@ bool ImGuiWrapper::DisplayFolder(fs::directory_entry entry, string displayName)
 void ImGuiWrapper::EnterFolder(fs::directory_entry entry)
 {
 	currentDir = entry.path().string();
-	m_pathStack.push(entry.path().string());
+	m_pathVector.push_back(entry.path().string());
 }
 
 void ImGuiWrapper::ExitCurrentFolder()
 {
-	if (m_pathStack.size() > 1)
+	if (m_pathVector.size() > 1)
 	{
-		m_pathStack.pop();
-		currentDir = m_pathStack.top();
+		m_pathVector.pop_back();
+		currentDir = m_pathVector.back();
 	}
 }
 

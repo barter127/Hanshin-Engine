@@ -40,9 +40,6 @@ cbuffer LightPixelBuffer : register(b2)
 }
 
 Texture2D diffuseTex : register(t0);
-Texture2D normalMap : register(t1);
-Texture2D roughnessMap : register(t2);
-Texture2D aoMap : register(t3);
 
 SamplerState bilinearSampler : register(s0);
 
@@ -103,15 +100,12 @@ float4 PS_main(VS_Out input) : SV_TARGET
     float3 finalColour = float3(0, 0, 0);
     
     float4 texel = diffuseTex.Sample(bilinearSampler, input.texCoord);
-    float ao = aoMap.Sample(bilinearSampler, input.texCoord).r;
     
     float3 normal = normalize(input.normal);
     float3 viewDir = normalize(input.viewDirection);
     
     // Normal maps need to be sampled otherwise the compiler tries to remove them and misalign texture units.
     // I didn't have time :<<<
-    float4 normalValue = normalMap.Sample(bilinearSampler, input.texCoord);
-    
     for (int i = 0; i < NumActiveLights; i++)
     {   
         switch (data[i].LightType)
@@ -135,7 +129,7 @@ float4 PS_main(VS_Out input) : SV_TARGET
         }
     } 
  
-    return float4(saturate(texel.rgb * finalColour * ao), normalValue.a);
+    return float4(saturate(texel.rgb * finalColour), 1);
 }
 
 float3 CalculatePointLight(float lightIntensity, float3 lightDir, float3 lightVector, float3 viewDir, float3 normal, float2 texCoord, int index)
@@ -156,7 +150,7 @@ float3 CalculatePointLight(float lightIntensity, float3 lightDir, float3 lightVe
         float3 halfwayVector = normalize(lightDir + viewDir);
 
         specular = pow(saturate(dot(normal, halfwayVector)), data[index].SpecularPower);
-        specular *= data[index].SpecularColour * roughnessMap.Sample(bilinearSampler, texCoord);
+        specular *= data[index].SpecularColour;
     }
     
     return saturate(float3(ambient + diffuse + specular) * attenuation);
@@ -180,7 +174,7 @@ float3 CalculateDirectionalLight(float lightIntensity, float3 lightDir, float3 v
         float3 halfwayVector = normalize(lightDir + viewDir);
 
         specular = pow(saturate(dot(normal, halfwayVector)), data[lightIndex].SpecularPower);
-        specular *= data[lightIndex].SpecularColour * roughnessMap.Sample(bilinearSampler, texCoord);
+        specular *= data[lightIndex].SpecularColour;
     }
     
     return (ambient + diffuse + specular);

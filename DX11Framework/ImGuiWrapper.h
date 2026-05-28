@@ -50,7 +50,7 @@ public:
 	void AcceptLoadRoot();
 
 	// Content Browser.
-	std::stack<std::string> m_pathStack; // ordinarily I'd put this at the bottom but as I'm gonna refactor it's here.
+	std::vector<std::string> m_pathVector; // ordinarily I'd put this at the bottom but as I'm gonna refactor it's here.
 	std::string GetFileName(std::filesystem::directory_entry entry, std::string path);
 	void DisplayTexture(std::filesystem::directory_entry entry, std::string displayName);
 	bool DisplayFolder(std::filesystem::directory_entry entry, std::string displayName);
