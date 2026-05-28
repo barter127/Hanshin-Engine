@@ -394,6 +394,49 @@ void ImGuiWrapper::ExitCurrentFolder()
 	}
 }
 
+void ImGuiWrapper::PathToolbar()
+{
+	auto FormatButtonText = [=](int currentIndex, int previousIndex)
+		{
+			// Here we assume that the index is 0 and pop the last charcter so the button doesn't display a slash.
+			if (previousIndex <= -1)
+			{
+				string returnStr = m_pathVector[0];
+				returnStr.pop_back();
+				return returnStr;
+			}
+
+			string currentDir = m_pathVector[currentIndex];
+			string previousDir = m_pathVector[previousIndex];
+		
+			int substrLength = currentDir.size() - previousDir.size();
+			return currentDir.substr(previousDir.size(), substrLength);
+		};
+
+	for (int i = 0; i < m_pathVector.size(); i++)
+	{
+
+		string test = FormatButtonText(i, i - 1);
+		if (ImGui::Button(test.c_str()))
+		{
+			int targetIndex = m_pathVector.size() - i;
+			for (int i = 1; i < m_pathVector.size(); i++)
+			{
+				m_pathVector.pop_back();
+			}
+
+			currentDir = m_pathVector[i];
+		}
+
+		if (i < m_pathVector.size() - 1)
+		{
+			ImGui::SameLine();
+			ImGui::Text(">");
+			ImGui::SameLine();
+		}
+	}
+}
+
 void ImGuiWrapper::ContentBrowser()
 {
 	ImGui::ShowDemoWindow();
@@ -404,7 +447,9 @@ void ImGuiWrapper::ContentBrowser()
 		ImGui::End();
 	}
 
-	ImGui::Text(currentDir.c_str());
+	// ImGui::Text(currentDir.c_str());
+
+	PathToolbar();
 
 	if (ImGui::Button("<"))
 	{

@@ -56,6 +56,7 @@ public:
 	bool DisplayFolder(std::filesystem::directory_entry entry, std::string displayName);
 	void EnterFolder(std::filesystem::directory_entry entry);
 	void ExitCurrentFolder();
+	void PathToolbar();
 	void ContentBrowser();
 
 
