@@ -1,11 +1,11 @@
 #include "TextureFlyweight.h"
-#include "TextureClass.h"
+#include "Texture.h"
 
 using namespace std;
 
-unordered_map<size_t, shared_ptr<TextureClass>> Texture_Flyweight::m_textureMap;
+unordered_map<size_t, shared_ptr<Texture>> Texture_Flyweight::m_textureMap;
 
-std::weak_ptr<TextureClass> Texture_Flyweight::FindTexture(string path, ID3D11Device* device, ID3D11DeviceContext* devCon)
+std::weak_ptr<Texture> Texture_Flyweight::FindTexture(string path, ID3D11Device* device, ID3D11DeviceContext* devCon)
 {
 	hash<string> hasher;
 	size_t key = hasher(path);
@@ -15,7 +15,7 @@ std::weak_ptr<TextureClass> Texture_Flyweight::FindTexture(string path, ID3D11De
 	}
 	else
 	{
-		shared_ptr<TextureClass> sharedTexturePtr = make_shared<TextureClass>();
+		shared_ptr<Texture> sharedTexturePtr = make_shared<Texture>();
 		sharedTexturePtr->Initialise(device, devCon, (char*)path.c_str());
 
 		m_textureMap.insert({ key, sharedTexturePtr });

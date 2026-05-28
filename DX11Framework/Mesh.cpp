@@ -1,12 +1,12 @@
 #include "Mesh.h"
 
-#include "TextureClass.h"
+#include "Texture.h"
 
 using namespace DirectX;
 
 Mesh::Mesh() {}
 
-Mesh::Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<std::shared_ptr<TextureClass>> textures) :
+Mesh::Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<std::shared_ptr<Texture>> textures) :
 	m_vertices(vertices),
 	m_indices(indices),
 	m_textures(textures)

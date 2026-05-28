@@ -6,11 +6,11 @@
 #include <d3d11.h>
 #include <stdio.h>
 #include <string>
-class TextureClass
+class Texture
 {
 public:
-	TextureClass();
-	~TextureClass();
+	Texture();
+	~Texture();
 
 	/*
 	* \brief Reads image data from path using stbi and creates DX11 Texture .

@@ -1,6 +1,6 @@
 #include "ModelComponent.h"
 
-#include "TextureClass.h"
+#include "Texture.h"
 #include "Mesh.h"
 #include <fstream>
 #include <string>
@@ -9,11 +9,6 @@
 
 using namespace DirectX;
 using namespace std;
-
-struct Texture {
-	std::string path;
-	ID3D11ShaderResourceView* texture;
-};
 
 ModelComponent::ModelComponent() {}
 
@@ -98,7 +93,7 @@ Mesh ModelComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
 	vector<VertexType> vertices;
 	vector<UINT> indices;
-	vector<std::shared_ptr<TextureClass>> textures;
+	vector<std::shared_ptr<Texture>> textures;
 
 	// Walk through each of the mesh's vertices.
 	for (UINT i = 0; i < mesh->mNumVertices; i++) 
@@ -174,7 +169,7 @@ bool ModelComponent::LoadModel(char* filename)
 	return true;
 }
 
-void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<TextureClass>>& textures)
+void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<Texture>>& textures)
 {
 	const unsigned int textureCount = mat->GetTextureCount(type);
 
@@ -186,7 +181,7 @@ void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, s
 	{
 		mat->GetTexture(type, i, &pathStr);
 
-		weak_ptr<TextureClass> weakTexturePtr = Texture_Flyweight::FindTexture(pathStr.C_Str(), m_device, m_deviceCon);
+		weak_ptr<Texture> weakTexturePtr = Texture_Flyweight::FindTexture(pathStr.C_Str(), m_device, m_deviceCon);
 		if (auto sharedTexturePtr = weakTexturePtr.lock())
 		{
 			textures.emplace_back(std::move(sharedTexturePtr));

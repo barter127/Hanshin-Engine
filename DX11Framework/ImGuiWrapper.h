@@ -17,11 +17,11 @@
 #include <memory>
 #include <stack>
 
-#include "RenderTextureClass.h"
+#include "RenderTexture.h"
 #include "Blurring.h"
 
 class GameObject;
-class TextureClass;
+class Texture;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -87,7 +87,7 @@ public:
 	};
 
 	// Maybe I could turn this into an array/vector.
-	RenderTextureClass* m_viewportTexture = nullptr;
+	RenderTexture* m_viewportTexture = nullptr;
 	Blurring* m_blurring = nullptr; // Maybe move this.
 
 private:
@@ -99,7 +99,7 @@ private:
 	int m_selectedItem = 0;
 	const char* m_shapeList[7] = { "Cube", "Plane","Sphere", "Cylinder", "Cone", "Torus", "Dragon" };
 
-	TextureClass* m_folderTexture = nullptr;
+	Texture* m_folderTexture = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D11Device> m_DevicePtr;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DevConPtr;

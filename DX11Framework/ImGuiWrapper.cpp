@@ -7,7 +7,7 @@
 
 #include "GameObject.h"
 #include "TransformComponent.h"
-#include "TextureClass.h"
+#include "Texture.h"
 #include "TextureFlyweight.h"
 #include "HelperMacros.h"
 
@@ -59,7 +59,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	style.FontScaleDpi = main_scale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
 	style.TreeLinesFlags = ImGuiTreeNodeFlags_DrawLinesToNodes;
 
-	m_viewportTexture = new RenderTextureClass();
+	m_viewportTexture = new RenderTexture();
 	m_viewportTexture->Initialise(device, 1280, 768, 0.3f, 1000.0f, 1);
 
 	m_blurring = new Blurring(device, deviceCon, hwnd);
@@ -71,7 +71,7 @@ void ImGuiWrapper::Initialise(HWND hwnd, ID3D11Device* device, ID3D11DeviceConte
 	m_DevConPtr = deviceCon;
 	m_WindowHandle = hwnd;
 
-	m_folderTexture = new TextureClass;
+	m_folderTexture = new Texture;
 	m_folderTexture->Initialise(m_DevicePtr.Get(), m_DevConPtr.Get(), (char*)"Engine Assets/folder.png");
 
 	m_pathVector.push_back(currentDir);
@@ -365,7 +365,7 @@ string ImGuiWrapper::GetFileName(fs::directory_entry entry)
 
 void ImGuiWrapper::DisplayTexture(fs::directory_entry entry, string displayName)
 {
-	std::weak_ptr<TextureClass> iconTexture = Texture_Flyweight::FindTexture(entry.path().string(), m_DevicePtr.Get(), m_DevConPtr.Get());
+	std::weak_ptr<Texture> iconTexture = Texture_Flyweight::FindTexture(entry.path().string(), m_DevicePtr.Get(), m_DevConPtr.Get());
 	if (iconTexture.expired()) return;
 
 	// Draw UI.

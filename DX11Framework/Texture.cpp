@@ -1,17 +1,17 @@
-#include "TextureClass.h"
+#include "Texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-TextureClass::TextureClass()
+Texture::Texture()
 {
 	m_texture = nullptr;
 	m_textureView = nullptr;
 }
 
-TextureClass::~TextureClass() {}
+Texture::~Texture() {}
 
-bool TextureClass::Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
+bool Texture::Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
 {
 	int bpp;
 	static const int STBI_RGBA_CHANNEL = 4;
@@ -76,7 +76,7 @@ bool TextureClass::Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	return true;
 }
 
-void TextureClass::Shutdown()
+void Texture::Shutdown()
 {
 	// Release the texture view resource.
 	if (m_textureView)
@@ -95,18 +95,18 @@ void TextureClass::Shutdown()
 	return;
 }
 
-ID3D11ShaderResourceView* TextureClass::GetTexture()
+ID3D11ShaderResourceView* Texture::GetTexture()
 {
 	return m_textureView;
 }
 
-int TextureClass::GetWidth()
+int Texture::GetWidth()
 {
 	return m_width;
 }
 
 
-int TextureClass::GetHeight()
+int Texture::GetHeight()
 {
 	return m_height;
 }

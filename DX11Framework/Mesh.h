@@ -9,7 +9,7 @@
 
 #include "ConstantBuffer.h"
 
-class TextureClass;
+class Texture;
 
 struct VertexType
 {
@@ -24,7 +24,7 @@ public:
 
 public:
 	Mesh();
-	Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<std::shared_ptr<TextureClass>> textures);
+	Mesh(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices, std::vector<std::shared_ptr<Texture>> textures);
 	~Mesh();
 
 	void Initialise(ID3D11Device* device, std::vector<VertexType> vertices, std::vector<UINT> indices);
@@ -37,7 +37,7 @@ private:
 private:
     std::vector<VertexType> m_vertices;
     std::vector<UINT> m_indices;
-	std::vector<std::shared_ptr<TextureClass>>  m_textures;
+	std::vector<std::shared_ptr<Texture>>  m_textures;
 
 	ID3D11Buffer* m_vertexBuffer = nullptr;
 	ID3D11Buffer* m_indexBuffer = nullptr;

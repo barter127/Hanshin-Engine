@@ -5,11 +5,12 @@
 #include <d3d11.h>
 #include <directxmath.h>
 
-class RenderTextureClass
+class RenderTexture
+
 {
 public:
-    RenderTextureClass();
-    ~RenderTextureClass();
+    RenderTexture();
+    ~RenderTexture();
 
     bool Initialise(ID3D11Device*, int screenWidth, int screenHeight, float screenDepth, float screenNear, int format);
     HRESULT CopyResource(ID3D11Device* device, ID3D11DeviceContext* devCon, ID3D11ShaderResourceView* resourceView);

@@ -1,6 +1,6 @@
 #include "ApplicationLayer.h"
 
-#include "TextureClass.h"
+#include "Texture.h"
 #include <algorithm>
 #include "ModelComponent.h"
 #include "ImGuiWrapper.h"

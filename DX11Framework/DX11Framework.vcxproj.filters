@@ -107,13 +107,13 @@
     <ClCompile Include="ModelComponent.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTextureClass.cpp">
+    <ClCompile Include="RenderTexture.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
     <ClCompile Include="TransformComponent.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
-    <ClCompile Include="TextureClass.cpp">
+    <ClCompile Include="Texture.cpp">
       <Filter>Source Files\Component</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
@@ -217,10 +217,10 @@
     <ClInclude Include="SkyBox.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="TextureClass.h">
+    <ClInclude Include="Texture.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTextureClass.h">
+    <ClInclude Include="RenderTexture.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="BaseLight.h">

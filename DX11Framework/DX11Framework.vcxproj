@@ -169,10 +169,10 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ModelComponent.cpp" />
     <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="RenderTextureClass.cpp" />
+    <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="Saving.cpp" />
     <ClCompile Include="SkyBox.cpp" />
-    <ClCompile Include="TextureClass.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureFlyweight.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
@@ -218,12 +218,12 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelComponent.h" />
     <ClInclude Include="PointLight.h" />
-    <ClInclude Include="RenderTextureClass.h" />
+    <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Saving.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="TextureClass.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureFlyweight.h" />
     <ClInclude Include="TransformComponent.h" />
   </ItemGroup>

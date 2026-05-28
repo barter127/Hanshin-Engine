@@ -1,8 +1,8 @@
-#include "RenderTextureClass.h"
+#include "RenderTexture.h"
 
 using namespace DirectX;
 
-RenderTextureClass::RenderTextureClass()
+RenderTexture::RenderTexture()
 {
     m_renderTargetTexture = nullptr;
     m_renderTargetView = nullptr;
@@ -11,9 +11,9 @@ RenderTextureClass::RenderTextureClass()
     m_depthStencilView = nullptr;
 }
 
-RenderTextureClass::~RenderTextureClass() {}
+RenderTexture::~RenderTexture() {}
 
-bool RenderTextureClass::Initialise(ID3D11Device* device, int textureWidth, int textureHeight, float screenDepth, float screenNear, int format)
+bool RenderTexture::Initialise(ID3D11Device* device, int textureWidth, int textureHeight, float screenDepth, float screenNear, int format)
 {
     D3D11_TEXTURE2D_DESC textureDesc;
     HRESULT result;
@@ -138,7 +138,7 @@ bool RenderTextureClass::Initialise(ID3D11Device* device, int textureWidth, int 
     return true;
 }
 
-HRESULT RenderTextureClass::CopyResource(ID3D11Device* device, ID3D11DeviceContext* devCon, ID3D11ShaderResourceView* resourceView)
+HRESULT RenderTexture::CopyResource(ID3D11Device* device, ID3D11DeviceContext* devCon, ID3D11ShaderResourceView* resourceView)
 {
     if (m_shaderResourceView != nullptr)
     {
@@ -180,7 +180,7 @@ HRESULT RenderTextureClass::CopyResource(ID3D11Device* device, ID3D11DeviceConte
     return hr;
 }
 
-void RenderTextureClass::Shutdown()
+void RenderTexture::Shutdown()
 {
     if (m_depthStencilView)
     {
@@ -213,7 +213,7 @@ void RenderTextureClass::Shutdown()
     }
 }
 
-void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext)
+void RenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
 {
     // Bind the render target view and depth stencil buffer to the output render pipeline.
     deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
@@ -221,7 +221,7 @@ void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext)
     deviceContext->RSSetViewports(1, &m_viewport);
 }
 
-void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext* deviceContext, float r, float g, float b, float a)
+void RenderTexture::ClearRenderTarget(ID3D11DeviceContext* deviceContext, float r, float g, float b, float a)
 {
     float color[4] = { r, g, b, a };
 
@@ -232,23 +232,23 @@ void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext* deviceContext, f
     deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
-ID3D11ShaderResourceView* RenderTextureClass::GetShaderResourceView()
+ID3D11ShaderResourceView* RenderTexture::GetShaderResourceView()
 {
     return m_shaderResourceView;
 }
 
-ID3D11Texture2D* RenderTextureClass::GetTexture()
+ID3D11Texture2D* RenderTexture::GetTexture()
 {
     return m_renderTargetTexture;
 }
 
-int RenderTextureClass::GetTextureWidth()
+int RenderTexture::GetTextureWidth()
 {
     return m_textureWidth;
 }
 
 
-int RenderTextureClass::GetTextureHeight()
+int RenderTexture::GetTextureHeight()
 {
     return m_textureHeight;
 }

@@ -5,7 +5,7 @@
 
 #include "ConstantBuffer.h"
 
-#include "RenderTextureClass.h"
+#include "RenderTexture.h"
 
 class Blurring
 {
@@ -26,7 +26,7 @@ private:
 	HRESULT InitShaders(ID3D11Device* device, HWND winHandle);
 	HRESULT InitBuffers(ID3D11Device* device);
 
-	RenderTextureClass* m_renderTexture;
+	RenderTexture* m_renderTexture;
 	
 	ID3D11Buffer* m_vertexBuffer;
 	ID3D11Buffer* m_indexBuffer;

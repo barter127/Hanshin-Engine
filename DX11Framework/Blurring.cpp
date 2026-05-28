@@ -14,7 +14,7 @@ Blurring::Blurring(ID3D11Device* device, ID3D11DeviceContext* deviceCon, HWND wi
 	InitShaders(device, winHandle);
 	InitBuffers(device);
 
-	m_renderTexture = new RenderTextureClass();
+	m_renderTexture = new RenderTexture();
 	m_renderTexture->Initialise(device, 1280.0f, 768.0f, 0.3f, 1000.0f, 1); // Hardcoded :<
 
 	D3D11_DEPTH_STENCIL_DESC dsDesc = { };

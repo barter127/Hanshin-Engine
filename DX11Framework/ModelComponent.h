@@ -14,7 +14,7 @@
 #include "ConstantBuffer.h"
 #include "TextureFlyweight.h"
 
-class TextureClass;
+class Texture;
 class Mesh;
 struct VertexType;
 
@@ -55,7 +55,7 @@ private:
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
-	void LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<TextureClass>>& textures);
+	void LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::vector<std::shared_ptr<Texture>>& textures);
 
 	std::vector<Mesh> m_meshes;
 
