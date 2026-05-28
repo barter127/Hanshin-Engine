@@ -449,7 +449,7 @@ void ImGuiWrapper::ContentBrowser()
 	constexpr ImGuiTableFlags browserFlags = ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_PadOuterX;
 
 	constexpr int tableWidth = 4;
-	int tableLength = 11;
+	int tableLength = 7;
 
 	ImGui::BeginTable("Tile Map Table", tableLength, browserFlags);
 
@@ -460,14 +460,14 @@ void ImGuiWrapper::ContentBrowser()
 
 	for (const auto& entry : fs::directory_iterator(currentDir))
 	{
-		ImGui::TableSetColumnIndex(columnIndex);
-		columnIndex++;
-
 		if (columnIndex >= tableLength)
 		{
 			columnIndex = 0;
 			ImGui::TableNextRow();
 		}
+
+		ImGui::TableSetColumnIndex(columnIndex);
+		columnIndex++;
 
 		string displayName = GetFileName(entry);
 		
