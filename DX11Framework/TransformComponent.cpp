@@ -233,3 +233,16 @@ XMMATRIX TransformComponent::GetInverseMatrix()
 
 	return XMMatrixInverse(nullptr, tempMatrix);
 }
+
+DirectX::XMFLOAT4X4 TransformComponent::Transform4x4()
+{
+	XMMATRIX matrix = XMMatrixScaling(m_scale.x, m_scale.y, m_scale.z) *
+		XMMatrixRotationX(XMConvertToRadians(m_rotation.x)) *
+		XMMatrixRotationY(XMConvertToRadians(m_rotation.y)) *
+		XMMatrixRotationZ(XMConvertToRadians(m_rotation.z)) *
+		XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
+
+	XMFLOAT4X4 float4x4;
+	XMStoreFloat4x4(&float4x4, matrix);
+	return float4x4;
+}

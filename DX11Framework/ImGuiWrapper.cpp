@@ -10,6 +10,7 @@
 #include "Texture.h"
 #include "TextureFlyweight.h"
 #include "HelperMacros.h"
+#include "Input.h"
 
 #include <filesystem>
 #include <iostream>
@@ -161,8 +162,16 @@ void ImGuiWrapper::StartUpdate(float deltaTime)
 	ImGui_ImplWin32_NewFrame();
 	ImGui_ImplDX11_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	DockSpace();
+
+	if (Input::GetKeyDown('W'))
+		m_currentOperation = ImGuizmo::OPERATION::TRANSLATE;
+	if (Input::GetKeyDown('E'))
+		m_currentOperation = ImGuizmo::OPERATION::ROTATE;
+	if (Input::GetKeyDown('R'))
+		m_currentOperation = ImGuizmo::OPERATION::SCALE;
 }
 
 void ImGuiWrapper::Render()
@@ -223,7 +232,42 @@ void ImGuiWrapper::ViewportUpdate(ID3D11DeviceContext* deviceCon)
 	
 	ImGui::Image((ImTextureID)(intptr_t)m_viewportTexture->GetShaderResourceView(), ImVec2{ size.x, size.y }, ImVec2{ 0, 0 }, ImVec2{ 1, 1 });
 
+	ImGuizmo::SetOrthographic(false);
+	ImGuizmo::SetDrawlist(ImGui::GetCurrentWindow()->DrawList);
+
+	ImVec2 windowPos = ImGui::GetWindowPos();
+	ImGuizmo::SetRect(windowPos.x, windowPos.y, size.x, size.y);
+
+
 	ImGui::End();
+}
+
+void ImGuiWrapper::HandleTransformGizmo(GameObject& obj, XMFLOAT4X4& view, XMFLOAT4X4& proj)
+{
+	// Convert matricies for Guizmo Manipulate.
+	const float* projPtr = &proj._11;
+	const float* viewPtr = &view._11;
+
+	DirectX::XMFLOAT4X4 transformMat = obj.GetTransform()->Transform4x4();
+	float* transformMatPtr = &transformMat._11;
+
+	// Draw & drag gizmo.
+	ImGuizmo::Manipulate(
+		viewPtr,
+		projPtr,
+		m_currentOperation,
+		m_currentMode,
+		transformMatPtr
+	);
+
+	float pos[3], rot[3], scale[3];
+	ImGuizmo::DecomposeMatrixToComponents(transformMatPtr, &pos[0], &rot[0], &scale[0]);
+
+	// Update transform.
+	TransformComponent* transform = obj.GetTransform();
+	transform->m_position = XMFLOAT3(pos[0], pos[1], pos[2]);
+	transform->m_rotation = XMFLOAT3(rot[0], rot[1], rot[2]);
+	transform->m_scale = XMFLOAT3(scale[0], scale[1], scale[2]);
 }
 
 int ImGuiWrapper::NewObjectPanel()

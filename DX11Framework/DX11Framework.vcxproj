@@ -147,6 +147,7 @@
     <ClCompile Include="..\External Libraries\imgui\backend\imgui_impl_dx12.cpp" />
     <ClCompile Include="..\External Libraries\imgui\backend\imgui_impl_win32.cpp" />
     <ClCompile Include="..\External Libraries\imgui\imgui.cpp" />
+    <ClCompile Include="..\External Libraries\imgui\ImGuizmo.cpp" />
     <ClCompile Include="..\External Libraries\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\External Libraries\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\External Libraries\imgui\imgui_tables.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="..\External Libraries\imgui\backend\imgui_impl_win32.h" />
     <ClInclude Include="..\External Libraries\imgui\imconfig.h" />
     <ClInclude Include="..\External Libraries\imgui\imgui.h" />
+    <ClInclude Include="..\External Libraries\imgui\ImGuizmo.h" />
     <ClInclude Include="..\External Libraries\imgui\imgui_internal.h" />
     <ClInclude Include="..\External Libraries\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\External Libraries\imgui\imstb_textedit.h" />

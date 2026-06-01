@@ -47,6 +47,8 @@ public:
 	DirectX::XMMATRIX GetTransformMatrix();
 	DirectX::XMMATRIX GetInverseMatrix();
 
+	DirectX::XMFLOAT4X4 Transform4x4();
+
 public:
 	DirectX::XMFLOAT3 m_position;
 	DirectX::XMFLOAT3 m_rotation;

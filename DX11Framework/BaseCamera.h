@@ -21,8 +21,8 @@ public:
 	inline DirectX::XMFLOAT3 GetEye() { return m_eye; }
 	inline DirectX::XMFLOAT3 GetUp() { return m_up; }
  
-	const DirectX::XMFLOAT4X4& GetView() { return m_view; }
-	const DirectX::XMFLOAT4X4& GetProj() { return m_projection; }
+	DirectX::XMFLOAT4X4& GetView() { return m_view; }
+	DirectX::XMFLOAT4X4& GetProj() { return m_projection; }
 
 protected:
 	std::string m_type = "Base";

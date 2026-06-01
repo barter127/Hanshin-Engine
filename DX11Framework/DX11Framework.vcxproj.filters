@@ -140,6 +140,9 @@
     <ClCompile Include="Saving.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\External Libraries\imgui\ImGuizmo.cpp">
+      <Filter>ExternalLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX11Framework.h">
@@ -243,6 +246,9 @@
     </ClInclude>
     <ClInclude Include="HelperMacros.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External Libraries\imgui\ImGuizmo.h">
+      <Filter>ExternalLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include <Windows.h>
 
 #include <imgui.h>
+#include <ImGuizmo.h>
 
 #include <d3d11_4.h>
 #include <d3dcompiler.h>
@@ -63,6 +64,7 @@ public:
 
 	void ViewportStart(ID3D11DeviceContext* deviceCon);
 	void ViewportUpdate(ID3D11DeviceContext* deviceCon);
+	void HandleTransformGizmo(GameObject& obj, DirectX::XMFLOAT4X4& view, DirectX::XMFLOAT4X4& proj);
 	// void GaussDataPanel();
 	//void BlurredViewportStart(ID3D11Device* device, ID3D11DeviceContext* deviceCon);
 	//void GaussianBlur(ID3D11DeviceContext* devCon);
@@ -103,6 +105,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> m_DevicePtr;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DevConPtr;
 	HWND m_WindowHandle;
+
+	ImGuizmo::OPERATION m_currentOperation;
+	ImGuizmo::MODE m_currentMode;
 };
 
 #endif // !IMGUI_WRAPPER_H

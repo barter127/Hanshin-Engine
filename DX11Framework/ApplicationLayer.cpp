@@ -160,6 +160,7 @@ void ApplicationLayer::Draw(MatrixBuffer& mb, DX11Framework* dx)
     m_skybox->Render(m_DevConPtr.Get(), mb, m_camVector[m_activeCamera]->GetEye());
 
     m_ui->ViewportUpdate(m_DevConPtr.Get());
+    m_ui->HandleTransformGizmo(*m_objVector[m_activeCamera], m_camVector[m_activeCamera]->GetView(), m_camVector[m_activeCamera]->GetProj());
 
     //m_ui->BlurredViewportStart(m_DevicePtr.Get(), m_DevConPtr.Get());
     //m_ui->GaussianBlur(m_DevConPtr.Get());
