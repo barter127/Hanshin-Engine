@@ -221,7 +221,6 @@
     <ClInclude Include="ModelComponent.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderTexture.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Saving.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stb_image.h" />

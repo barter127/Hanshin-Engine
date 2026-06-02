@@ -1,7 +1,6 @@
 #include "DX11Framework.h"
 #include <string>
 #include "ApplicationLayer.h"
-#include "resource.h"
 
 using namespace DirectX;
 
@@ -79,19 +78,6 @@ HRESULT DX11Framework::CreateWindowHandle(HINSTANCE hInstance, int nCmdShow)
 
     _windowHandle = CreateWindowExW(0, windowName, windowName, WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
         _WindowWidth, _WindowHeight, nullptr, nullptr, hInstance, nullptr);
-
-    HICON hIconBig = (HICON)LoadImage(
-        hInstance,
-        MAKEINTRESOURCE(IDI_ICON1),
-        IMAGE_ICON,
-        GetSystemMetrics(SM_CXICON),     // Usually 32x32 or 48x48
-        GetSystemMetrics(SM_CYICON),
-        LR_DEFAULTCOLOR);
-
-    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-
-    SendMessage(_windowHandle, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-    SendMessage(_windowHandle, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 
     return S_OK;
 }
