@@ -4,6 +4,13 @@
 #include <DirectXMath.h>
 #include <string>
 
+enum class CameraTypes
+{
+	Base,
+	Debug,
+	Dolly,
+};
+
 class BaseCamera
 {
 public:
@@ -13,7 +20,7 @@ public:
 
 	void virtual Update(float deltaTime);
 
-	inline std::string GetType() { return m_type; }
+	inline CameraTypes GetType() { return m_type; }
 
 	inline virtual DirectX::XMFLOAT3 GetAt() { return m_at; }
 	inline void SetAt(DirectX::XMFLOAT3 at) { m_at = at; }
@@ -25,7 +32,7 @@ public:
 	DirectX::XMFLOAT4X4& GetProj() { return m_projection; }
 
 protected:
-	std::string m_type = "Base";
+	CameraTypes m_type = CameraTypes::Base;
 
 	DirectX::XMFLOAT3 m_eye;
 	DirectX::XMFLOAT3 m_at;

@@ -9,7 +9,7 @@ DebugCamera::DebugCamera(XMFLOAT3 position, XMFLOAT3 at, XMFLOAT3 up,
 
 	BaseCamera(position, at, up, windowWidth, windowHeight, near, far) 
 {
-	m_type = "Debug";
+	m_type = CameraTypes::Debug;
 }
 
 DebugCamera::~DebugCamera() {}

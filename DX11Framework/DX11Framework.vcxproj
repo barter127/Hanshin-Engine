@@ -178,7 +178,6 @@
     <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SaveTest.json" />
     <None Include="SimpleShaders.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
@@ -190,7 +189,6 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
       <FileType>Document</FileType>
     </None>
-    <None Include="test.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External Libraries\imgui\backend\imgui_impl_dx11.h" />

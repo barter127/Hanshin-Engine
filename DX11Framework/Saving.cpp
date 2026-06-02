@@ -67,29 +67,31 @@ bool Saving::LoadSceneFromJSON(string path, vector<shared_ptr<GameObject>>& scen
 	{
 		json& camDesc = cams.at(i);
 
-		std::string camType = camDesc["Camera Type"];
+		CameraTypes camType = camDesc["Camera Type"];
 
 		XMFLOAT3 eye = ReadXMFloat3("Eye", camDesc);
 		XMFLOAT3 at = ReadXMFloat3("At", camDesc);
 		XMFLOAT3 up = ReadXMFloat3("Up", camDesc);
 
-		if (camType == "Base")
+		switch (camType)
 		{
-			camVector.push_back(std::make_shared<BaseCamera>(eye, at, up,
-				1280, 768, 0.01f, 100.0f));
-		}
-		else if (camType == "Debug")
-		{
-			float yaw = camDesc["Yaw"];
-			float pitch = camDesc["Pitch"];
-			float sensitivity = camDesc["Sensitivity"];
-			float speed = camDesc["Speed"];
+			case CameraTypes::Base:
+				camVector.push_back(std::make_shared<BaseCamera>(eye, at, up,
+					1280, 768, 0.01f, 100.0f));
 
-			std::shared_ptr<DebugCamera> debugPtr = std::make_shared<DebugCamera>(eye, at, up,
-				1280, 768, 0.01f, 100.0f);
-			debugPtr->Initialise(yaw, pitch, sensitivity, speed);
+			case CameraTypes::Debug:
+			{
+				float yaw = camDesc["Yaw"];
+				float pitch = camDesc["Pitch"];
+				float sensitivity = camDesc["Sensitivity"];
+				float speed = camDesc["Speed"];
 
-			camVector.push_back(debugPtr);
+				std::shared_ptr<DebugCamera> debugPtr = std::make_shared<DebugCamera>(eye, at, up,
+					1280, 768, 0.01f, 100.0f);
+				debugPtr->Initialise(yaw, pitch, sensitivity, speed);
+
+				camVector.push_back(debugPtr);
+			}
 		}
 	}
 	return true;
@@ -136,44 +138,48 @@ bool Saving::SaveSceneFromJSON(string path, vector<shared_ptr<GameObject>>& scen
 	json camerasJson = json::array();
 	for (std::shared_ptr<BaseCamera> cam : camVector)
 	{
-		std::string camType = cam->GetType();
+		CameraTypes camType = cam->GetType();
 
-
-		if (camType == "Base")
+		switch (camType)
 		{
-			camerasJson.push_back(json::object(
-				{
-					{"Camera Type", camType},
+			case CameraTypes::Base:
+			{
+				camerasJson.push_back(json::object(
+					{
+						{"Camera Type", camType},
 
-					SaveXMFloat3("Eye", cam->GetEye()),
-					SaveXMFloat3("At", cam->GetAt()),
-					SaveXMFloat3("Up", cam->GetUp()),
-				}));
-		}
+						SaveXMFloat3("Eye", cam->GetEye()),
+						SaveXMFloat3("At", cam->GetAt()),
+						SaveXMFloat3("Up", cam->GetUp()),
+					}));
+			}
 
-		else if (camType == "Debug")
-		{
-			DebugCamera* debugCam = (DebugCamera*)cam.get();
+			case CameraTypes::Debug:
+			{
+				DebugCamera* debugCam = (DebugCamera*)cam.get();
 
-			float yaw = debugCam->GetYaw();
-			float pitch = debugCam->GetPitch();
-			float speed = debugCam->m_speed;
-			float sensitivty = debugCam->m_sensitivity;
+				float yaw = debugCam->GetYaw();
+				float pitch = debugCam->GetPitch();
+				float speed = debugCam->m_speed;
+				float sensitivty = debugCam->m_sensitivity;
 
-			camerasJson.push_back(json::object(
-				{
-					{"Camera Type", camType},
+				camerasJson.push_back(json::object(
+					{
+						{"Camera Type", camType},
 
-					SaveXMFloat3("Eye", cam->GetEye()),
-					SaveXMFloat3("At", cam->GetAt()),
-					SaveXMFloat3("Up", cam->GetUp()),
+						SaveXMFloat3("Eye", cam->GetEye()),
+						SaveXMFloat3("At", cam->GetAt()),
+						SaveXMFloat3("Up", cam->GetUp()),
 
-					{"Yaw", yaw},
-					{"Pitch", pitch},
+						{"Yaw", yaw},
+						{"Pitch", pitch},
 
-					{"Speed", speed},
-					{"Sensitivity", sensitivty}
-				}));
+						{"Speed", speed},
+						{"Sensitivity", sensitivty}
+					}));
+			}
+
+			case CameraTypes::Dolly:
 		}
 
 		fileWrite << json::object({

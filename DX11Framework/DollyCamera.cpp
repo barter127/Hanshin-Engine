@@ -9,7 +9,7 @@ DollyCamera::DollyCamera(XMFLOAT3 position, XMFLOAT3 at, XMFLOAT3 up,
 
     BaseCamera(position, at, up, windowWidth, windowHeight , near, far)
 {
-    m_type = "Dolly";
+    m_type = CameraTypes::Dolly;
 }
 
 DollyCamera::~DollyCamera()

@@ -252,12 +252,6 @@
     <None Include="SimpleShaders.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="test.json">
-      <Filter>Json</Filter>
-    </None>
-    <None Include="SaveTest.json">
-      <Filter>Json</Filter>
-    </None>
     <None Include="Skybox.hlsl">
       <Filter>Shaders</Filter>
     </None>
