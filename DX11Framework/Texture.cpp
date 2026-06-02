@@ -3,6 +3,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "HelperMacros.h"
+
 Texture::Texture()
 {
 	m_texture = nullptr;
@@ -76,23 +78,10 @@ bool Texture::Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceContex
 	return true;
 }
 
-void Texture::Shutdown()
+void Texture::Release()
 {
-	// Release the texture view resource.
-	if (m_textureView)
-	{
-		m_textureView->Release();
-		m_textureView = nullptr;
-	}
-
-	// Release the texture.
-	if (m_texture)
-	{
-		m_texture->Release();
-		m_texture = nullptr;
-	}
-
-	return;
+	if (m_texture) RELEASE_PTR(m_texture)
+	if (m_textureView) RELEASE_PTR(m_textureView)
 }
 
 ID3D11ShaderResourceView* Texture::GetTexture()
@@ -104,7 +93,6 @@ int Texture::GetWidth()
 {
 	return m_width;
 }
-
 
 int Texture::GetHeight()
 {

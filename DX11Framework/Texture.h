@@ -19,7 +19,7 @@ public:
 	bool Initialise(ID3D11Device* device, ID3D11DeviceContext* deviceCon, char* filePath);
 
 	// \brief Releases the texture and texture view and sets them to nullptr.
-	void Shutdown();
+	void Release();
 
 	ID3D11ShaderResourceView* GetTexture();
 

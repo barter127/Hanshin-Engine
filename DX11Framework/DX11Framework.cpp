@@ -3,6 +3,7 @@
 #include "ApplicationLayer.h"
 
 using namespace DirectX;
+using namespace std;
 
 //#define RETURNFAIL(x) if(FAILED(x)) return x;
 #define ThrowOnFail(x) if(FAILED(x)) throw new std::exception;
@@ -52,8 +53,8 @@ HRESULT DX11Framework::Initialise(HINSTANCE hInstance, int nShowCmd)
     hr = InitPipelineVariables();
     if (FAILED(hr)) return E_FAIL;
 
-    m_Application = new ApplicationLayer;
-    m_Application->Initialise(_device, _immediateContext, _windowHandle);
+    m_Application = make_unique<ApplicationLayer>();
+    m_Application->Initialise(m_device.Get(), m_immediateContext, m_windowHandle);
 
     return hr;
 }
@@ -76,8 +77,8 @@ HRESULT DX11Framework::CreateWindowHandle(HINSTANCE hInstance, int nCmdShow)
 
     RegisterClassW(&wndClass);
 
-    _windowHandle = CreateWindowExW(0, windowName, windowName, WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
-        _WindowWidth, _WindowHeight, nullptr, nullptr, hInstance, nullptr);
+    m_windowHandle = CreateWindowExW(0, windowName, windowName, WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
+        m_windowWidth, m_windowHeight, nullptr, nullptr, hInstance, nullptr);
 
     return S_OK;
 }
@@ -105,20 +106,20 @@ HRESULT DX11Framework::CreateD3DDevice()
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    hr = baseDevice->QueryInterface(__uuidof(ID3D11Device), reinterpret_cast<void**>(&_device));
-    hr = baseDeviceContext->QueryInterface(__uuidof(ID3D11DeviceContext), reinterpret_cast<void**>(&_immediateContext));
+    hr = baseDevice->QueryInterface(__uuidof(ID3D11Device), reinterpret_cast<void**>(m_device.GetAddressOf()));
+    hr = baseDeviceContext->QueryInterface(__uuidof(ID3D11DeviceContext), reinterpret_cast<void**>(&m_immediateContext));
 
     baseDevice->Release();
     baseDeviceContext->Release();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    hr = _device->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&_dxgiDevice));
+    hr = m_device.Get()->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(m_dxgiDevice.GetAddressOf()));
     if (FAILED(hr)) return hr;
 
     IDXGIAdapter* dxgiAdapter;
-    hr = _dxgiDevice->GetAdapter(&dxgiAdapter);
-    hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&_dxgiFactory));
+    hr = m_dxgiDevice->GetAdapter(&dxgiAdapter);
+    hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(m_dxgiFactory.GetAddressOf()));
     dxgiAdapter->Release();
 
     return S_OK;
@@ -142,21 +143,21 @@ HRESULT DX11Framework::CreateSwapChainAndFrameBuffer()
     swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
     swapChainDesc.Flags = 0;
 
-    hr = _dxgiFactory->CreateSwapChainForHwnd(_device, _windowHandle, &swapChainDesc, nullptr, nullptr, &_swapChain);
+    hr = m_dxgiFactory->CreateSwapChainForHwnd(m_device.Get(), m_windowHandle, &swapChainDesc, nullptr, nullptr, m_swapChain.GetAddressOf());
     if (FAILED(hr)) return hr;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     ID3D11Texture2D* frameBuffer = nullptr;
 
-    hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&frameBuffer));
+    hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&frameBuffer));
     if (FAILED(hr)) return hr;
 
     D3D11_RENDER_TARGET_VIEW_DESC framebufferDesc = {};
     framebufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; //sRGB render target enables hardware gamma correction
     framebufferDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-    hr = _device->CreateRenderTargetView(frameBuffer, &framebufferDesc, &_frameBufferView);
+    hr = m_device->CreateRenderTargetView(frameBuffer, &framebufferDesc, &m_frameBufferView);
     if (FAILED(hr)) return hr;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,15 +168,15 @@ HRESULT DX11Framework::CreateSwapChainAndFrameBuffer()
     depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-    _device->CreateTexture2D(&depthBufferDesc, nullptr, &_depthStencilBuffer);
-    _device->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
+    m_device->CreateTexture2D(&depthBufferDesc, nullptr, &m_depthStencilBuffer);
+    m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), nullptr, m_depthStencilView.GetAddressOf());
 
     D3D11_DEPTH_STENCIL_DESC dssDesc = { };
     dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
     dssDesc.DepthEnable = true;
     dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 
-    _device->CreateDepthStencilState(&dssDesc, &_depthStencilState);
+    m_device->CreateDepthStencilState(&dssDesc, &m_depthStencilState);
     frameBuffer->Release();
 
     return hr;
@@ -200,12 +201,12 @@ HRESULT DX11Framework::InitShadersAndInputLayout()
     hr = D3DCompileFromFile(L"SimpleShaders.hlsl", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS_main", "vs_5_0", dwShaderFlags, 0, &vsBlob, &errorBlob);
     if (FAILED(hr))
     {
-        MessageBoxA(_windowHandle, (char*)errorBlob->GetBufferPointer(), nullptr, ERROR);
+        MessageBoxA(m_windowHandle, (char*)errorBlob->GetBufferPointer(), nullptr, ERROR);
         errorBlob->Release();
         return hr;
     }
 
-    hr = _device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &_vertexShader);
+    hr = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
 
     if (FAILED(hr)) return hr;
 
@@ -216,7 +217,7 @@ HRESULT DX11Framework::InitShadersAndInputLayout()
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
     };
 
-    hr = _device->CreateInputLayout(inputElementDesc, ARRAYSIZE(inputElementDesc), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &_inputLayout);
+    hr = m_device->CreateInputLayout(inputElementDesc, ARRAYSIZE(inputElementDesc), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), m_inputLayout.GetAddressOf());
     if (FAILED(hr)) return hr;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,12 +227,12 @@ HRESULT DX11Framework::InitShadersAndInputLayout()
     hr = D3DCompileFromFile(L"SimpleShaders.hlsl", nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS_main", "ps_5_0", dwShaderFlags, 0, &psBlob, &errorBlob);
     if (FAILED(hr))
     {
-        MessageBoxA(_windowHandle, (char*)errorBlob->GetBufferPointer(), nullptr, ERROR);
+        MessageBoxA(m_windowHandle, (char*)errorBlob->GetBufferPointer(), nullptr, ERROR);
         errorBlob->Release();
         return hr;
     }
 
-    hr = _device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &_pixelShader);
+    hr = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
 
 
     vsBlob->Release();
@@ -245,8 +246,8 @@ HRESULT DX11Framework::InitPipelineVariables()
     HRESULT hr = S_OK;
 
     //Input Assembler
-    _immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    _immediateContext->IASetInputLayout(_inputLayout);
+    m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_immediateContext->IASetInputLayout(m_inputLayout.Get());
 
     // Rasterizer
     D3D11_RASTERIZER_DESC rasterizerDesc = {};
@@ -258,35 +259,34 @@ HRESULT DX11Framework::InitPipelineVariables()
     wireframeDesc.FillMode = D3D11_FILL_WIREFRAME;
     wireframeDesc.CullMode = D3D11_CULL_NONE;
 
-    hr = _device->CreateRasterizerState(&rasterizerDesc, &_rasterizerState);
-    hr = _device->CreateRasterizerState(&wireframeDesc, &_wireframeState);
+    hr = m_device->CreateRasterizerState(&rasterizerDesc, m_rasterizerState.GetAddressOf());
+    hr = m_device->CreateRasterizerState(&wireframeDesc, m_wireframeState.GetAddressOf());
     if (FAILED(hr)) return hr;
 
-    _immediateContext->RSSetState(_rasterizerState);
+    m_immediateContext->RSSetState(m_rasterizerState.Get());
 
     //Viewport Values
-    _viewport = { 0.0f, 0.0f, (float)_WindowWidth, (float)_WindowHeight, 0.0f, 1.0f };
-    _immediateContext->RSSetViewports(1, &_viewport);
+    m_viewport = { 0.0f, 0.0f, (float)m_windowWidth, (float)m_windowHeight, 0.0f, 1.0f };
+    m_immediateContext->RSSetViewports(1, &m_viewport);
 
     return S_OK;
 }
 
 DX11Framework::~DX11Framework()
 {
-    if (_immediateContext)_immediateContext->Release();
-    if (_device)_device->Release();
-    if (_dxgiDevice)_dxgiDevice->Release();
-    if (_dxgiFactory)_dxgiFactory->Release();
-    if (_frameBufferView)_frameBufferView->Release();
-    if (_swapChain)_swapChain->Release();
+    if (m_immediateContext) m_immediateContext->Release();
+    if (m_dxgiDevice) m_dxgiDevice->Release();
+    if (m_dxgiFactory)m_dxgiFactory->Release();
+    if (m_frameBufferView) m_frameBufferView->Release();
+    if (m_swapChain) m_swapChain->Release();
 
-    if (_rasterizerState)_rasterizerState->Release();
-    if (_wireframeState)_wireframeState->Release();
-    if (_vertexShader)_vertexShader->Release();
-    if (_inputLayout)_inputLayout->Release();
-    if (_pixelShader)_pixelShader->Release();
-    if (_depthStencilBuffer)_depthStencilBuffer->Release();
-    if (_depthStencilView)_depthStencilView->Release();
+    if (m_rasterizerState) m_rasterizerState->Release();
+    if (m_wireframeState) m_wireframeState->Release();
+    if (m_vertexShader) m_vertexShader->Release();
+    if (m_inputLayout) m_inputLayout->Release();
+    if (m_pixelShader) m_pixelShader->Release();
+    if (m_depthStencilBuffer) m_depthStencilBuffer->Release();
+    if (m_depthStencilView) m_depthStencilView->Release();
 }
 
 void DX11Framework::Update()
@@ -303,42 +303,42 @@ void DX11Framework::Update()
 
    m_Application->Update(deltaTime);
 
-    XMStoreFloat4x4(&_World, XMMatrixIdentity());
+    XMStoreFloat4x4(&m_world, XMMatrixIdentity());
 }
 
 void DX11Framework::Draw()
 {    
     //Store this frames data in constant buffer struct
-    _mbData.World = XMLoadFloat4x4(&_World);
-    _mbData.View = XMLoadFloat4x4(&_View);
-    _mbData.Projection = XMLoadFloat4x4(&_Projection);
+    m_mbData.World = XMLoadFloat4x4(&m_world);
+    m_mbData.View = XMLoadFloat4x4(&m_view);
+    m_mbData.Projection = XMLoadFloat4x4(&m_projection);
 
-    _mbData.World = XMMatrixTranspose(_mbData.World);
-    _mbData.View = XMMatrixTranspose(_mbData.View);
-    _mbData.Projection = XMMatrixTranspose(_mbData.Projection);
+    m_mbData.World = XMMatrixTranspose(m_mbData.World);
+    m_mbData.View = XMMatrixTranspose(m_mbData.View);
+    m_mbData.Projection = XMMatrixTranspose(m_mbData.Projection);
 
-    _immediateContext->RSSetState(_rasterizerState);
-    _mbData.World = XMLoadFloat4x4(&_World);
+    m_immediateContext->RSSetState(m_rasterizerState.Get());
+    m_mbData.World = XMLoadFloat4x4(&m_world);
 
-    _immediateContext->VSSetShader(_vertexShader, nullptr, 0);
-    _immediateContext->PSSetShader(_pixelShader, nullptr, 0);
+    m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+    m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
-    _immediateContext->OMSetDepthStencilState(_depthStencilState, 0);
+    m_immediateContext->OMSetDepthStencilState(m_depthStencilState.Get(), 0);
 
-    m_Application->Draw(_mbData, this);
+    m_Application->Draw(m_mbData, this);
 
     SetBackBufferRenderTarget();
     ResetViewport();
 
-    _swapChain->Present(0, 0);
+    m_swapChain->Present(0, 0);
 }
 
 void DX11Framework::SetBackBufferRenderTarget()
 {
-    _immediateContext->OMSetRenderTargets(1, &_frameBufferView, _depthStencilView);
+    m_immediateContext->OMSetRenderTargets(1, m_frameBufferView.GetAddressOf(), m_depthStencilView.Get());
 }
 
 void DX11Framework::ResetViewport()
 {
-    _immediateContext->RSSetViewports(1, &_viewport);
+    m_immediateContext->RSSetViewports(1, &m_viewport);
 }

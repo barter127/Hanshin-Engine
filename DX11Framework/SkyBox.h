@@ -3,7 +3,10 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 
+#include <wrl.h>
+
 #include <string>
+#include <memory>
 #include "stb_image.h"
 
 class ModelComponent;
@@ -18,6 +21,8 @@ public:
 
 	void Render(ID3D11DeviceContext* devCon, MatrixBuffer& mb, DirectX::XMFLOAT3 camPosition);
 
+	void Release();
+
 private:
 	HRESULT InitTextureGrid(ID3D11Device* device, ID3D11DeviceContext* devCon, const char* texturePathArray[6]);
 	HRESULT InitShaders(ID3D11Device* device, HWND winHandle);
@@ -27,13 +32,13 @@ private:
 private:
 	int m_width, m_height;
 
-	ID3D11Texture2D* m_texture = nullptr;
-	ModelComponent* m_cube = nullptr;
+	Microsoft::WRL::ComPtr <ID3D11Texture2D> m_texture = nullptr;
+	std::unique_ptr<ModelComponent> m_cube = nullptr;
 
-	ID3D11DepthStencilState* m_depthStencil = nullptr;
-	ID3D11RasterizerState* m_rasterState;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencil = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterState = nullptr;
 
-	ID3D11VertexShader* m_vertShader;
-	ID3D11PixelShader* m_pixelShader;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertShader = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader = nullptr;
 };
 

@@ -6,6 +6,7 @@
 
 #define DELETE_PTR(ptr) delete ptr; ptr = nullptr;
 
+#define RELEASE_PTR(ptr) ptr->Release(); ptr = nullptr;
 #define STRING_TO_CHARPTR(str) (char*)str.c_str()
 
 #endif // ! COMMON_MACROS

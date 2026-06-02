@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 
+#include "HelperMacros.h"
+
 using namespace DirectX;
 using namespace std;
 
@@ -47,6 +49,8 @@ void ModelComponent::Release()
 	{
 		m_meshes[i].Release();
 	}
+
+	if (m_constantBuffer) RELEASE_PTR(m_constantBuffer)
 }
 
 void ModelComponent::Render(ID3D11DeviceContext* deviceContext, MatrixBuffer& mb)
@@ -146,7 +150,7 @@ Mesh ModelComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
-	return Mesh(m_device, vertices, indices, textures);
+	return Mesh(m_device.Get(), vertices, indices, textures);
 }
 
 bool ModelComponent::LoadModel(char* filename)
@@ -181,7 +185,7 @@ void ModelComponent::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, s
 	{
 		mat->GetTexture(type, i, &pathStr);
 
-		weak_ptr<Texture> weakTexturePtr = Texture_Flyweight::FindTexture(pathStr.C_Str(), m_device, m_deviceCon);
+		weak_ptr<Texture> weakTexturePtr = Texture_Flyweight::FindTexture(pathStr.C_Str(), m_device.Get(), m_deviceCon.Get());
 		if (auto sharedTexturePtr = weakTexturePtr.lock())
 		{
 			textures.emplace_back(std::move(sharedTexturePtr));

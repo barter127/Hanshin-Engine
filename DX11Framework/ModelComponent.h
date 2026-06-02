@@ -3,6 +3,8 @@
 
 #include <d3d11.h>
 #include <directxmath.h>
+#include <wrl.h>
+
 #include <vector>
 #include <unordered_map>
 #include <memory>
@@ -54,8 +56,8 @@ private:
 	UINT m_indexCount;
 
 	// TODO: Convert to smartptr
-	ID3D11Device* m_device = nullptr;
-	ID3D11DeviceContext* m_deviceCon = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Device> m_device = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceCon = nullptr;
 
 	MatrixBuffer m_cbData;
 	ID3D11Buffer* m_constantBuffer;

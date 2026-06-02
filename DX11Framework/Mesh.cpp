@@ -62,16 +62,10 @@ void Mesh::Draw(ID3D11DeviceContext* deviceCon)
 void Mesh::Release()
 {
 	// Release the index buffer.
-	if (m_indexBuffer)
-	{
-		DELETE_PTR(m_indexBuffer)
-	}
+	if (m_indexBuffer) DELETE_PTR(m_indexBuffer)
+	if (m_vertexBuffer) DELETE_PTR(m_indexBuffer)
 
-	// Release the vertex buffer.
-	if (m_vertexBuffer)
-	{
-		DELETE_PTR(m_indexBuffer)
-	}
+	if (m_bilinearSamplerState) RELEASE_PTR(m_bilinearSamplerState);
 }
 
 bool Mesh::InitBuffers(ID3D11Device* device)

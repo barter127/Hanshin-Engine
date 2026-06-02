@@ -31,6 +31,7 @@ private:
     ID3D11ShaderResourceView* m_shaderResourceView;
     ID3D11Texture2D* m_depthStencilBuffer;
     ID3D11DepthStencilView* m_depthStencilView;
+
     D3D11_VIEWPORT m_viewport;
     DirectX::XMMATRIX m_projectionMatrix;
     DirectX::XMMATRIX m_orthoMatrix;

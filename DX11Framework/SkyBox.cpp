@@ -2,7 +2,10 @@
 #include "ConstantBuffer.h"
 #include "ModelComponent.h"
 
+#include "HelperMacros.h"
+
 using namespace DirectX;
+using namespace std;
 
 HRESULT SkyBox::Initialise(ID3D11Device* device, ID3D11DeviceContext* devCon, HWND winHandle, const char* texturePathArray[6])
 {
@@ -13,7 +16,7 @@ HRESULT SkyBox::Initialise(ID3D11Device* device, ID3D11DeviceContext* devCon, HW
 	hr = InitRasterState(device);
 	hr = InitDepthStencil(device);
 
-	m_cube = new ModelComponent();
+	m_cube = make_unique<ModelComponent>();
 	bool result = m_cube->Initialise(device, devCon, (char*)"Primitives/Prim_Cube.obj");
 
 	return hr;
@@ -21,16 +24,20 @@ HRESULT SkyBox::Initialise(ID3D11Device* device, ID3D11DeviceContext* devCon, HW
 
 void SkyBox::Render(ID3D11DeviceContext* devCon, MatrixBuffer& mb, XMFLOAT3 camPosition)
 {
-	devCon->VSSetShader(m_vertShader, nullptr, 0);
-	devCon->PSSetShader(m_pixelShader, nullptr, 0);
+	devCon->VSSetShader(m_vertShader.Get(), nullptr, 0);
+	devCon->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
-	devCon->OMSetDepthStencilState(m_depthStencil, 0);
-	devCon->RSSetState(m_rasterState);
+	devCon->OMSetDepthStencilState(m_depthStencil.Get(), 0);
+	devCon->RSSetState(m_rasterState.Get());
 
 	devCon->PSSetShaderResources(0, 1, &m_textureView);
 
 	mb.World = XMMatrixTranspose(XMMatrixScaling(10,10,10) * XMMatrixTranslation(camPosition.x, camPosition.y, camPosition.z));
 	m_cube->Render(devCon, mb);
+}
+
+void SkyBox::Release()
+{
 }
 
 HRESULT SkyBox::InitTextureGrid(ID3D11Device* device, ID3D11DeviceContext* devCon, const char* texturePathArray[6])
@@ -51,7 +58,7 @@ HRESULT SkyBox::InitTextureGrid(ID3D11Device* device, ID3D11DeviceContext* devCo
 		imageData[i] = stbi_load(texturePathArray[i], &m_width, &m_height, &bpp, STBI_RGBA_CHANNEL);
 		if (imageData[i] == nullptr)
 		{
-			std::string failureReason = stbi_failure_reason();
+			string failureReason = stbi_failure_reason();
 			return S_FALSE;
 		}
 	}
@@ -96,7 +103,7 @@ HRESULT SkyBox::InitTextureGrid(ID3D11Device* device, ID3D11DeviceContext* devCo
 	srvDesc.Texture2D.MipLevels = -1;
 
 	// Create the shader resource view for the texture.
-	hResult = device->CreateShaderResourceView(m_texture, &srvDesc, &m_textureView);
+	hResult = device->CreateShaderResourceView(m_texture.Get(), &srvDesc, &m_textureView);
 	if (FAILED(hResult))
 	{
 		return hr;

@@ -1,5 +1,7 @@
 #include "RenderTexture.h"
 
+#include "HelperMacros.h"
+
 using namespace DirectX;
 
 RenderTexture::RenderTexture()
@@ -182,35 +184,11 @@ HRESULT RenderTexture::CopyResource(ID3D11Device* device, ID3D11DeviceContext* d
 
 void RenderTexture::Shutdown()
 {
-    if (m_depthStencilView)
-    {
-        m_depthStencilView->Release();
-        m_depthStencilView = nullptr;
-    }
-
-    if (m_depthStencilBuffer)
-    {
-        m_depthStencilBuffer->Release();
-        m_depthStencilBuffer = nullptr;
-    }
-
-    if (m_shaderResourceView)
-    {
-        m_shaderResourceView->Release();
-        m_shaderResourceView = nullptr;
-    }
-
-    if (m_renderTargetView)
-    {
-        m_renderTargetView->Release();
-        m_renderTargetView = nullptr;
-    }
-
-    if (m_renderTargetTexture)
-    {
-        m_renderTargetTexture->Release();
-        m_renderTargetTexture = nullptr;
-    }
+    if (m_depthStencilView) RELEASE_PTR(m_depthStencilView)
+    if (m_depthStencilBuffer) RELEASE_PTR(m_depthStencilBuffer)
+    if (m_shaderResourceView) RELEASE_PTR(m_shaderResourceView)
+    if (m_renderTargetView) RELEASE_PTR(m_renderTargetView)
+    if (m_renderTargetTexture) RELEASE_PTR(m_renderTargetTexture)
 }
 
 void RenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
@@ -246,7 +224,6 @@ int RenderTexture::GetTextureWidth()
 {
     return m_textureWidth;
 }
-
 
 int RenderTexture::GetTextureHeight()
 {
